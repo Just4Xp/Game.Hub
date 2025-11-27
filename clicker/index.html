@@ -51,7 +51,7 @@ button {
 </head>
 <body>
 
-<h1>Clicker Game - Goal 10M</h1>
+<h1>Clicker Game - Goal 1M</h1>
 
 <div id="score">0</div>
 <div id="sps">Auto SPS: 0<br>Click CPS: 0<br>Total SPS: 0</div>
@@ -61,30 +61,21 @@ button {
 
 <h2>Click Upgrades</h2>
 <button class="upgrade" id="upgradeClick">Upgrade Click Power (Cost: 20)</button>
-<button class="upgrade" id="superClick">Super Click +5 (Cost: 100)</button>
 
 <h2>Auto-Clicker Upgrades</h2>
 <button class="upgrade" id="autoClicker">Buy Auto Clicker (Cost: 50)</button>
-<button class="upgrade" id="autoFactory">Build Auto Factory (Cost: 500)</button>
-
-<h2>Mega Upgrades</h2>
-<button class="upgrade" id="megaClick">Mega Click x2 (Cost: 150)</button>
-<button class="upgrade" id="autoMega">Auto-Mega +1% (Cost: 300)</button>
 
 <button id="backButton">⬅ Back to Hub</button>
 
 <script>
 /* ================== VARIABLES ================== */
 let score = 0;
-let clickPower = 1, clickUpgradeCost = 20, superClickCost = 100;
+let clickPower = 1, clickUpgradeCost = 20;
 let clickCount = 0, clickSPS = 0;
 let autoClickers = 0, autoClickerCost = 50;
 let autoBasePower = 3; 
 let autoComboMultiplier = 1;
-let autoFactory = 0, autoFactoryCost = 500;
-let megaActive = false, megaClickCost = 150;
-let autoMegaChance = 0, autoMegaCost = 300;
-const goalScore = 10000000;
+const goalScore = 1000000; // 1M
 
 /* ================== UI ELEMENTS ================== */
 const scoreDisplay = document.getElementById("score");
@@ -93,15 +84,9 @@ const messageDisplay = document.getElementById("message");
 
 const clickBtn = document.getElementById("clickButton");
 const upgradeClickBtn = document.getElementById("upgradeClick");
-const superClickBtn = document.getElementById("superClick");
-
 const autoBtn = document.getElementById("autoClicker");
-const autoFactoryBtn = document.getElementById("autoFactory");
-
-const megaBtn = document.getElementById("megaClick");
-const autoMegaBtn = document.getElementById("autoMega");
-
 const backBtn = document.getElementById("backButton");
+
 backBtn.addEventListener("click", () => {
     window.location.href = "../index.html"; // adjust path to your hub
 });
@@ -110,9 +95,12 @@ backBtn.addEventListener("click", () => {
 clickBtn.addEventListener("click", ()=>{
     if(score >= goalScore) return;
     clickCount++;
-    let power = clickPower;
-    if(megaActive) power *= 2; 
-    score += power;
+    score += clickPower;
+
+    // click animation
+    scoreDisplay.style.transform = "scale(1.2)";
+    setTimeout(()=>{ scoreDisplay.style.transform = "scale(1)"; }, 100);
+
     checkGoal();
     update();
 });
@@ -121,64 +109,20 @@ clickBtn.addEventListener("click", ()=>{
 upgradeClickBtn.addEventListener("click", ()=>{
     if(score >= clickUpgradeCost && score < goalScore){
         score -= clickUpgradeCost;
-        clickPower++;
-        clickUpgradeCost = Math.floor(clickUpgradeCost*1.8);
+        clickPower *= 2; // double click power
+        clickUpgradeCost = Math.floor(clickUpgradeCost*2); // cost scales
         upgradeClickBtn.textContent=`Upgrade Click Power (Cost: ${clickUpgradeCost})`;
         update();
     }
 });
-superClickBtn.addEventListener("click", ()=>{
-    if(score >= superClickCost && score < goalScore){
-        score -= superClickCost;
-        clickPower += 5;
-        superClickCost = Math.floor(superClickCost*2.2);
-        superClickBtn.textContent=`Super Click +5 (Cost: ${superClickCost})`;
-        update();
-    }
-});
+
 autoBtn.addEventListener("click", ()=>{
     if(score >= autoClickerCost && score < goalScore){
         score -= autoClickerCost;
-        if(autoClickers === 0) autoBtn.textContent = `Upgrade Auto Clicker (Cost: ${autoClickerCost})`;
         autoClickers++;
         autoComboMultiplier = 1 + autoClickers*0.15;
-        autoClickerCost = Math.floor(autoClickerCost*1.8);
+        autoClickerCost = Math.floor(autoClickerCost*2);
         autoBtn.textContent=`Upgrade Auto Clicker (Cost: ${autoClickerCost})`;
-        update();
-    }
-});
-autoFactoryBtn.addEventListener("click", ()=>{
-    if(score >= autoFactoryCost && score < goalScore){
-        score -= autoFactoryCost;
-        autoFactory++;
-        autoFactoryCost = Math.floor(autoFactoryCost*2);
-        autoFactoryBtn.textContent=`Build Auto Factory (Cost: ${autoFactoryCost})`;
-        update();
-    }
-});
-megaBtn.addEventListener("click", ()=>{
-    if(score >= megaClickCost && !megaActive && score < goalScore){
-        score -= megaClickCost;
-        activateMega();
-        update();
-    }
-});
-function activateMega(){
-    megaActive = true;
-    megaBtn.textContent="MEGA ACTIVE!";
-    megaBtn.classList.add("disabled");
-    setTimeout(()=>{
-        megaActive = false;
-        megaBtn.textContent=`Mega Click x2 (Cost: ${megaClickCost})`;
-        megaBtn.classList.remove("disabled");
-    },10000);
-}
-autoMegaBtn.addEventListener("click", ()=>{
-    if(score >= autoMegaCost && score < goalScore){
-        score -= autoMegaCost;
-        autoMegaChance++;
-        autoMegaCost = Math.floor(autoMegaCost*2);
-        autoMegaBtn.textContent=`Auto-Mega ${autoMegaChance}% (Cost: ${autoMegaCost})`;
         update();
     }
 });
@@ -187,22 +131,17 @@ autoMegaBtn.addEventListener("click", ()=>{
 setInterval(()=>{
     clickSPS = clickCount;
     clickCount = 0;
-},1000);
 
-setInterval(()=>{
     if(score >= goalScore) return;
-    autoClickers += autoFactory*0.02;
-    autoClickers = Number(autoClickers.toFixed(2));
 
-    let crit = Math.random() < 0.1 ? 2 : 1;
-    let gain = autoClickers*autoBasePower*(1+autoComboMultiplier*0.15)*crit;
-    score += gain;
+    let autoGain = autoClickers * autoBasePower * (1 + autoComboMultiplier*0.15);
+    score += autoGain;
 
-    if(!megaActive && Math.random()*100 < autoMegaChance) activateMega();
     checkGoal();
     update();
 },1000);
 
+/* ================== GOAL CHECK ================== */
 function checkGoal(){
     if(score >= goalScore){
         score = goalScore;
@@ -210,6 +149,7 @@ function checkGoal(){
     }
 }
 
+/* ================== UI UPDATE ================== */
 function update(){
     scoreDisplay.textContent = Math.floor(score);
     let autoSPS = autoClickers*autoBasePower*(1+autoComboMultiplier*0.15);
@@ -218,11 +158,7 @@ function update(){
 
     function dis(btn, cond){ btn.classList.toggle("disabled", cond); }
     dis(upgradeClickBtn, score < clickUpgradeCost || score >= goalScore);
-    dis(superClickBtn, score < superClickCost || score >= goalScore);
     dis(autoBtn, score < autoClickerCost || score >= goalScore);
-    dis(autoFactoryBtn, score < autoFactoryCost || score >= goalScore);
-    dis(megaBtn, score < megaClickCost || megaActive || score >= goalScore);
-    dis(autoMegaBtn, score < autoMegaCost || score >= goalScore);
 }
 </script>
 </body>
