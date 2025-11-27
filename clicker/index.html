@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clicker Game</title>
+<style>
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #1e1e2f;
+    color: #f0f0f0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+h1 { margin-bottom: 10px; color: #ffd700; }
+
+#score { font-size: 48px; margin: 10px 0; }
+#sps { font-size: 16px; margin: 5px 0; }
+#message { font-size: 20px; margin: 10px 0; color: #ffeb3b; }
+
+button {
+    padding: 12px 25px;
+    font-size: 18px;
+    margin: 10px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.2s;
+    max-width: 90%;
+}
+
+#clickButton { background: #4CAF50; color: white; }
+#clickButton:hover { background: #43a047; }
+
+.upgrade { background: #ff9800; color: white; display: block; width: 350px; max-width: 90%; margin: 10px auto; }
+.upgrade:hover { background: #e68a00; }
+
+.disabled { background: #bdbdbd !important; cursor: not-allowed; }
+
+#backButton {
+    background: #2196F3;
+    color: white;
+}
+#backButton:hover {
+    background: #1976D2;
+}
+</style>
+</head>
+<body>
+
+<h1>Clicker Game - Goal 10M</h1>
+
+<div id="score">0</div>
+<div id="sps">Auto SPS: 0<br>Click CPS: 0<br>Total SPS: 0</div>
+<div id="message"></div>
+
+<button id="clickButton">CLICK ME!</button>
+
+<h2>Click Upgrades</h2>
+<button class="upgrade" id="upgradeClick">Upgrade Click Power (Cost: 20)</button>
+<button class="upgrade" id="superClick">Super Click +5 (Cost: 100)</button>
+
+<h2>Auto-Clicker Upgrades</h2>
+<button class="upgrade" id="autoClicker">Buy Auto Clicker (Cost: 50)</button>
+<button class="upgrade" id="autoFactory">Build Auto Factory (Cost: 500)</button>
+
+<h2>Mega Upgrades</h2>
+<button class="upgrade" id="megaClick">Mega Click x2 (Cost: 150)</button>
+<button class="upgrade" id="autoMega">Auto-Mega +1% (Cost: 300)</button>
+
+<button id="backButton">⬅ Back to Hub</button>
+
+<script>
+/* ================== VARIABLES ================== */
+let score = 0;
+let clickPower = 1, clickUpgradeCost = 20, superClickCost = 100;
+let clickCount = 0, clickSPS = 0;
+let autoClickers = 0, autoClickerCost = 50;
+let autoBasePower = 3; 
+let autoComboMultiplier = 1;
+let autoFactory = 0, autoFactoryCost = 500;
+let megaActive = false, megaClickCost = 150;
+let autoMegaChance = 0, autoMegaCost = 300;
+const goalScore = 10000000;
+
+/* ================== UI ELEMENTS ================== */
+const scoreDisplay = document.getElementById("score");
+const spsDisplay = document.getElementById("sps");
+const messageDisplay = document.getElementById("message");
+
+const clickBtn = document.getElementById("clickButton");
+const upgradeClickBtn = document.getElementById("upgradeClick");
+const superClickBtn = document.getElementById("superClick");
+
+const autoBtn = document.getElementById("autoClicker");
+const autoFactoryBtn = document.getElementById("autoFactory");
+
+const megaBtn = document.getElementById("megaClick");
+const autoMegaBtn = document.getElementById("autoMega");
+
+const backBtn = document.getElementById("backButton");
+backBtn.addEventListener("click", () => {
+    window.location.href = "../index.html"; // adjust path to your hub
+});
+
+/* ================== CLICKING ================== */
+clickBtn.addEventListener("click", ()=>{
+    if(score >= goalScore) return;
+    clickCount++;
+    let power = clickPower;
+    if(megaActive) power *= 2; 
+    score += power;
+    checkGoal();
+    update();
+});
+
+/* ================== UPGRADES ================== */
+upgradeClickBtn.addEventListener("click", ()=>{
+    if(score >= clickUpgradeCost && score < goalScore){
+        score -= clickUpgradeCost;
+        clickPower++;
+        clickUpgradeCost = Math.floor(clickUpgradeCost*1.8);
+        upgradeClickBtn.textContent=`Upgrade Click Power (Cost: ${clickUpgradeCost})`;
+        update();
+    }
+});
+superClickBtn.addEventListener("click", ()=>{
+    if(score >= superClickCost && score < goalScore){
+        score -= superClickCost;
+        clickPower += 5;
+        superClickCost = Math.floor(superClickCost*2.2);
+        superClickBtn.textContent=`Super Click +5 (Cost: ${superClickCost})`;
+        update();
+    }
+});
+autoBtn.addEventListener("click", ()=>{
+    if(score >= autoClickerCost && score < goalScore){
+        score -= autoClickerCost;
+        if(autoClickers === 0) autoBtn.textContent = `Upgrade Auto Clicker (Cost: ${autoClickerCost})`;
+        autoClickers++;
+        autoComboMultiplier = 1 + autoClickers*0.15;
+        autoClickerCost = Math.floor(autoClickerCost*1.8);
+        autoBtn.textContent=`Upgrade Auto Clicker (Cost: ${autoClickerCost})`;
+        update();
+    }
+});
+autoFactoryBtn.addEventListener("click", ()=>{
+    if(score >= autoFactoryCost && score < goalScore){
+        score -= autoFactoryCost;
+        autoFactory++;
+        autoFactoryCost = Math.floor(autoFactoryCost*2);
+        autoFactoryBtn.textContent=`Build Auto Factory (Cost: ${autoFactoryCost})`;
+        update();
+    }
+});
+megaBtn.addEventListener("click", ()=>{
+    if(score >= megaClickCost && !megaActive && score < goalScore){
+        score -= megaClickCost;
+        activateMega();
+        update();
+    }
+});
+function activateMega(){
+    megaActive = true;
+    megaBtn.textContent="MEGA ACTIVE!";
+    megaBtn.classList.add("disabled");
+    setTimeout(()=>{
+        megaActive = false;
+        megaBtn.textContent=`Mega Click x2 (Cost: ${megaClickCost})`;
+        megaBtn.classList.remove("disabled");
+    },10000);
+}
+autoMegaBtn.addEventListener("click", ()=>{
+    if(score >= autoMegaCost && score < goalScore){
+        score -= autoMegaCost;
+        autoMegaChance++;
+        autoMegaCost = Math.floor(autoMegaCost*2);
+        autoMegaBtn.textContent=`Auto-Mega ${autoMegaChance}% (Cost: ${autoMegaCost})`;
+        update();
+    }
+});
+
+/* ================== AUTO CLICKER LOOP ================== */
+setInterval(()=>{
+    clickSPS = clickCount;
+    clickCount = 0;
+},1000);
+
+setInterval(()=>{
+    if(score >= goalScore) return;
+    autoClickers += autoFactory*0.02;
+    autoClickers = Number(autoClickers.toFixed(2));
+
+    let crit = Math.random() < 0.1 ? 2 : 1;
+    let gain = autoClickers*autoBasePower*(1+autoComboMultiplier*0.15)*crit;
+    score += gain;
+
+    if(!megaActive && Math.random()*100 < autoMegaChance) activateMega();
+    checkGoal();
+    update();
+},1000);
+
+function checkGoal(){
+    if(score >= goalScore){
+        score = goalScore;
+        messageDisplay.textContent = "🌿 Touch some grass! 🌿";
+    }
+}
+
+function update(){
+    scoreDisplay.textContent = Math.floor(score);
+    let autoSPS = autoClickers*autoBasePower*(1+autoComboMultiplier*0.15);
+    let totalSPS = autoSPS + clickSPS;
+    spsDisplay.innerHTML = "Auto SPS: "+Math.floor(autoSPS)+"<br>Click CPS: "+clickSPS+"<br>Total SPS: "+Math.floor(totalSPS);
+
+    function dis(btn, cond){ btn.classList.toggle("disabled", cond); }
+    dis(upgradeClickBtn, score < clickUpgradeCost || score >= goalScore);
+    dis(superClickBtn, score < superClickCost || score >= goalScore);
+    dis(autoBtn, score < autoClickerCost || score >= goalScore);
+    dis(autoFactoryBtn, score < autoFactoryCost || score >= goalScore);
+    dis(megaBtn, score < megaClickCost || megaActive || score >= goalScore);
+    dis(autoMegaBtn, score < autoMegaCost || score >= goalScore);
+}
+</script>
+</body>
+</html>
