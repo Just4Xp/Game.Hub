@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>2-Player Shooter</title>
+<style>
+    body { margin:0; background:#000; display:flex; justify-content:center; align-items:center; height:100vh; }
+    canvas { background:#111; border:3px solid #0f0; border-radius:10px; }
+    #overlay {
+        position:fixed; inset:0; background:rgba(0,0,0,0.8);
+        display:none; justify-content:center; align-items:center;
+        flex-direction:column; color:#0f0; font-family:Arial;
+    }
+    button {
+        margin-top:20px; padding:10px 25px; font-size:20px; border:none;
+        background:#0f0; color:#000; border-radius:10px; cursor:pointer;
+    }
+</style>
+</head>
+<body>
+<canvas id="game" width="900" height="600"></canvas>
+
+<div id="overlay">
+    <h1 id="winnerText"></h1>
+    <button onclick="restart()">Restart</button>
+</div>
+
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+// Players
+let p1 = { x:200, y:300, size:20, speed:4, color:'#00f', dx:0, dy:0, health:100 };
+let p2 = { x:700, y:300, size:20, speed:4, color:'#f00', dx:0, dy:0, health:100 };
+
+let keys = {};
+let bullets = [];
+let gameLoopId;
+
+window.addEventListener("keydown", e => keys[e.key] = true);
+window.addEventListener("keyup",   e => keys[e.key] = false);
+
+// Shooting
+window.addEventListener("keydown", e => {
+    if(e.key === "Shift"){
+        bullets.push({ x:p1.x, y:p1.y, size:5, color:'#0ff', owner:1,
+            dx:p1.dx === 0 && p1.dy === 0 ? 5 : p1.dx * 2,
+            dy:p1.dx === 0 && p1.dy === 0 ? 0 : p1.dy * 2 });
+    }
+    if(e.key === "Enter"){
+        bullets.push({ x:p2.x, y:p2.y, size:5, color:'#f88', owner:2,
+            dx:p2.dx === 0 && p2.dy === 0 ? -5 : p2.dx * 2,
+            dy:p2.dx === 0 && p2.dy === 0 ? 0 : p2.dy * 2 });
+    }
+});
+
+function movement(){
+    p1.dx = p1.dy = 0;
+    if(keys['w']||keys['W']) p1.dy = -p1.speed;
+    if(keys['s']||keys['S']) p1.dy =  p1.speed;
+    if(keys['a']||keys['A']) p1.dx = -p1.speed;
+    if(keys['d']||keys['D']) p1.dx =  p1.speed;
+
+    p2.dx = p2.dy = 0;
+    if(keys['ArrowUp'])    p2.dy = -p2.speed;
+    if(keys['ArrowDown'])  p2.dy =  p2.speed;
+    if(keys['ArrowLeft'])  p2.dx = -p2.speed;
+    if(keys['ArrowRight']) p2.dx =  p2.speed;
+
+    p1.x += p1.dx; p1.y += p1.dy;
+    p2.x += p2.dx; p2.y += p2.dy;
+
+    p1.x = Math.max(0, Math.min(900, p1.x));
+    p1.y = Math.max(0, Math.min(600, p1.y));
+    p2.x = Math.max(0, Math.min(900, p2.x));
+    p2.y = Math.max(0, Math.min(600, p2.y));
+}
+
+function updateBullets(){
+    bullets.forEach((b,i)=>{
+        b.x += b.dx;
+        b.y += b.dy;
+
+        // Out of bounds
+        if(b.x<0||b.x>900||b.y<0||b.y>600){ bullets.splice(i,1); return; }
+
+        // Collision
+        if(b.owner === 1){
+            let dist = Math.hypot(b.x - p2.x, b.y - p2.y);
+            if(dist < p2.size){ p2.health -= 10; bullets.splice(i,1); checkWin(); }
+        }
+        if(b.owner === 2){
+            let dist = Math.hypot(b.x - p1.x, b.y - p1.y);
+            if(dist < p1.size){ p1.health -= 10; bullets.splice(i,1); checkWin(); }
+        }
+    });
+}
+
+function draw(){
+    ctx.clearRect(0,0,900,600);
+
+    ctx.strokeStyle = '#0f0';
+    ctx.lineWidth = 0.2;
+    for(let i=0;i<900;i+=40){ ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i,600); ctx.stroke(); }
+    for(let j=0;j<600;j+=40){ ctx.beginPath(); ctx.moveTo(0,j); ctx.lineTo(900,j); ctx.stroke(); }
+
+    bullets.forEach(b => { ctx.fillStyle = b.color; ctx.fillRect(b.x-3, b.y-3, 6, 6); });
+
+    ctx.fillStyle = p1.color;
+    ctx.beginPath(); ctx.arc(p1.x, p1.y, p1.size, 0, Math.PI*2); ctx.fill();
+
+    ctx.fillStyle = p2.color;
+    ctx.beginPath(); ctx.arc(p2.x, p2.y, p2.size, 0, Math.PI*2); ctx.fill();
+
+    ctx.fillStyle = '#0f0';
+    ctx.font = "20px Arial";
+    ctx.fillText(`P1 Health: ${p1.health}`, 20, 30);
+    ctx.fillText(`P2 Health: ${p2.health}`, 720, 30);
+}
+
+function checkWin(){
+    if(p1.health <= 0) endGame("PLAYER 2 WINS!");
+    if(p2.health <= 0) endGame("PLAYER 1 WINS!");
+}
+
+function endGame(text){
+    document.getElementById("winnerText").textContent = text;
+    document.getElementById("overlay").style.display = "flex";
+    cancelAnimationFrame(gameLoopId);
+}
+
+function restart(){
+    p1 = { x:200, y:300, size:20, speed:4, color:'#00f', dx:0, dy:0, health:100 };
+    p2 = { x:700, y:300, size:20, speed:4, color:'#f00', dx:0, dy:0, health:100 };
+    bullets = [];
+    document.getElementById("overlay").style.display = "none";
+    loop();
+}
+
+function loop(){
+    movement();
+    updateBullets();
+    draw();
+    gameLoopId = requestAnimationFrame(loop);
+}
+
+loop();
+</script>
+</body>
+</html>
