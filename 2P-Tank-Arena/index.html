@@ -145,7 +145,7 @@ let bullets=[];
 
 // Input
 const keys = {};
-window.addEventListener('keydown', e => { if(e.repeat) return; keys[e.key]=true; if(e.key==='Shift') tryShoot(p1); if(e.key==='Enter') tryShoot(p2); });
+window.addEventListener('keydown', e => { if(e.repeat) return; keys[e.key]=true; if(e.key===' ') tryShoot(p1); if(e.key==='Enter') tryShoot(p2); });
 window.addEventListener('keyup', e => { keys[e.key]=false; });
 
 // Mobile touch buttons
