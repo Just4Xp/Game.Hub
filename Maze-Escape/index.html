@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Maze Escape</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root {
+    --cell: 38px;
+    --wall: #111827;
+    --path: #020617;
+    --player: #38bdf8;
+    --exit: #22c55e;
+    --fog: rgba(0,0,0,0.88);
+    --glow: 0 0 12px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    background: radial-gradient(circle at top, #0f172a, #020617);
+    color: white;
+    font-family: "Segoe UI", system-ui;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+#game {
+    background: rgba(2,6,23,0.95);
+    border-radius: 16px;
+    padding: 18px;
+    box-shadow: 0 0 40px rgba(56,189,248,0.25);
+    text-align: center;
+    position: relative;
+}
+
+h1 {
+    margin: 0 0 10px;
+    font-size: 1.4rem;
+    letter-spacing: 1px;
+}
+
+#stats {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+}
+
+#maze {
+    display: grid;
+    gap: 3px;
+    margin: 10px auto;
+}
+
+.cell {
+    width: var(--cell);
+    height: var(--cell);
+    border-radius: 6px;
+    position: relative;
+}
+
+.wall { background: var(--wall); }
+.path { background: var(--path); }
+
+.player {
+    background: var(--player);
+    box-shadow: var(--glow) var(--player);
+}
+
+.exit {
+    background: var(--exit);
+    box-shadow: var(--glow) var(--exit);
+}
+
+.fog::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--fog);
+    border-radius: 6px;
+}
+
+button {
+    margin-top: 12px;
+    padding: 10px 18px;
+    background: linear-gradient(135deg, #38bdf8, #6366f1);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+#win {
+    position: absolute;
+    inset: 0;
+    background: rgba(2,6,23,0.97);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    border-radius: 16px;
+    z-index: 10;
+}
+</style>
+</head>
+<body>
+
+<div id="game">
+    <h1>🧩 MAZE ESCAPE</h1>
+
+    <div id="stats">
+        <span>⏱ <span id="time">0</span>s</span>
+        <span>👣 <span id="moves">0</span></span>
+    </div>
+
+    <div id="maze"></div>
+
+    <button onclick="restart()">🔄 Restart</button>
+
+    <div id="win">
+        <h2>🎉 YOU ESCAPED!</h2>
+        <p id="finalStats"></p>
+        <button onclick="restart()">Play Again</button>
+    </div>
+</div>
+
+<script>
+/* ================= CONFIG ================= */
+const size = 21;      // maze size (odd)
+const radius = 2;    // visibility radius
+
+/* ================= STATE ================= */
+let maze = [];
+let player = { x: 1, y: 1 };
+let moves = 0, time = 0, timer;
+
+/* ================= ELEMENTS ================= */
+const mazeEl = document.getElementById("maze");
+mazeEl.style.gridTemplateColumns = `repeat(${size}, var(--cell))`;
+
+const timeEl = document.getElementById("time");
+const movesEl = document.getElementById("moves");
+const winEl = document.getElementById("win");
+const finalStats = document.getElementById("finalStats");
+
+/* ================= SOUND ================= */
+const ctx = new (window.AudioContext || window.webkitAudioContext)();
+function beep(freq, dur = 0.08) {
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.frequency.value = freq;
+    o.connect(g);
+    g.connect(ctx.destination);
+    o.start();
+    g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + dur);
+    o.stop(ctx.currentTime + dur);
+}
+
+/* ================= HARD MAZE GENERATOR ================= */
+function generateMaze() {
+    maze = Array.from({ length: size }, () => Array(size).fill("#"));
+
+    function carve(x, y) {
+        const dirs = [[2,0],[-2,0],[0,2],[0,-2]].sort(() => Math.random() - 0.5);
+        for (const [dx, dy] of dirs) {
+            const nx = x + dx, ny = y + dy;
+            if (
+                nx > 0 && ny > 0 &&
+                nx < size - 1 && ny < size - 1 &&
+                maze[ny][nx] === "#"
+            ) {
+                maze[ny][nx] = " ";
+                maze[y + dy / 2][x + dx / 2] = " ";
+                carve(nx, ny);
+            }
+        }
+    }
+
+    // Perfect maze
+    maze[1][1] = " ";
+    carve(1, 1);
+
+    // False side paths (dead ends only)
+    for (let y = 1; y < size - 1; y += 2) {
+        for (let x = 1; x < size - 1; x += 2) {
+            if (maze[y][x] === " " && Math.random() < 0.35) {
+                const dirs = [[1,0],[-1,0],[0,1],[0,-1]];
+                const [dx, dy] = dirs[Math.floor(Math.random() * 4)];
+                const nx = x + dx, ny = y + dy;
+                const fx = x + dx * 2, fy = y + dy * 2;
+
+                if (
+                    fx > 0 && fy > 0 &&
+                    fx < size - 1 && fy < size - 1 &&
+                    maze[ny][nx] === "#" &&
+                    maze[fy][fx] === "#"
+                ) {
+                    maze[ny][nx] = " ";
+                    maze[fy][fx] = " ";
+                }
+            }
+        }
+    }
+
+    // Rare loops (NO ROOMS)
+    for (let i = 0; i < size * 2; i++) {
+        const x = 1 + Math.floor(Math.random() * (size - 2));
+        const y = 1 + Math.floor(Math.random() * (size - 2));
+        if (maze[y][x] === "#") {
+            let open = 0;
+            [[1,0],[-1,0],[0,1],[0,-1]].forEach(([dx, dy]) => {
+                if (maze[y + dy][x + dx] === " ") open++;
+            });
+            if (open === 2) maze[y][x] = " ";
+        }
+    }
+
+    maze[size - 2][size - 2] = "E";
+}
+
+/* ================= DRAW ================= */
+function draw() {
+    mazeEl.innerHTML = "";
+    maze.forEach((row, y) => {
+        row.forEach((c, x) => {
+            const d = document.createElement("div");
+            d.className = "cell " + (c === "#" ? "wall" : "path");
+
+            if (x === player.x && y === player.y) d.classList.add("player");
+            if (c === "E") d.classList.add("exit");
+
+            if (Math.abs(x - player.x) > radius || Math.abs(y - player.y) > radius)
+                d.classList.add("fog");
+
+            mazeEl.appendChild(d);
+        });
+    });
+}
+
+/* ================= GAME LOGIC ================= */
+function move(dx, dy) {
+    const nx = player.x + dx, ny = player.y + dy;
+    if (maze[ny][nx] === "#") { beep(120); return; }
+    player.x = nx; player.y = ny;
+    moves++; movesEl.textContent = moves;
+    beep(420);
+    if (maze[ny][nx] === "E") winGame();
+    draw();
+}
+
+function winGame() {
+    clearInterval(timer);
+    winEl.style.display = "flex";
+    finalStats.textContent = `Time: ${time}s | Moves: ${moves}`;
+    beep(900, 0.3);
+    document.removeEventListener("keydown", keys);
+}
+
+function keys(e) {
+    if (e.key === "ArrowUp" || e.key === "w") move(0, -1);
+    if (e.key === "ArrowDown" || e.key === "s") move(0, 1);
+    if (e.key === "ArrowLeft" || e.key === "a") move(-1, 0);
+    if (e.key === "ArrowRight" || e.key === "d") move(1, 0);
+}
+
+/* ================= RESTART ================= */
+function restart() {
+    generateMaze();
+    player = { x: 1, y: 1 };
+    moves = time = 0;
+    movesEl.textContent = 0;
+    timeEl.textContent = 0;
+    winEl.style.display = "none";
+    clearInterval(timer);
+    timer = setInterval(() => timeEl.textContent = ++time, 1000);
+    document.addEventListener("keydown", keys);
+    draw();
+}
+
+restart();
+</script>
+</body>
+</html>
