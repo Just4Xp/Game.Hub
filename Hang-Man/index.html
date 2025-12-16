@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>HANG MAN</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+  background:#0d1117;
+  color:#e5e7eb;
+  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  min-height:100vh;
+  margin:0;
+  padding:20px 0;
+  overflow-y:auto;
+}
+.game {
+  width:480px;
+  background:#111827;
+  border-radius:16px;
+  padding:30px;
+  box-shadow:0 0 50px #38bdf8;
+  text-align:center;
+  transition:0.3s;
+  margin-bottom:40px;
+}
+h1 {
+  color:#38bdf8;
+  margin-bottom:20px;
+  font-size:30px;
+}
+.meaning {
+  font-size:16px;
+  margin:25px 0 25px 0;
+  color:#a5b4fc;
+  min-height:30px;
+}
+.word {
+  font-size:28px;
+  letter-spacing:8px;
+  margin:20px 0;
+  color:#facc15;
+}
+.letters {
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:8px;
+  margin-top:15px;
+}
+button {
+  padding:10px;
+  border:none;
+  border-radius:8px;
+  background:#1f2937;
+  color:#e5e7eb;
+  cursor:pointer;
+  font-weight:bold;
+  transition:0.2s;
+}
+button:hover:not(:disabled) {
+  background:#0ea5e9;
+  color:#020617;
+}
+button:disabled {
+  background:#334155;
+  cursor:not-allowed;
+}
+.status {
+  margin-top:15px;
+  font-weight:bold;
+  min-height:24px;
+  font-size:16px;
+  color:#f87171;
+}
+.note {
+  margin-top:10px;
+  font-size:12px;
+  color:#94a3b8;
+  font-style:italic;
+}
+#fontSelector {
+  margin-top:10px;
+  padding:5px 8px;
+  border-radius:6px;
+  background:#1f2937;
+  color:#e5e7eb;
+  border:none;
+  font-weight:bold;
+  cursor:pointer;
+}
+svg {
+  margin-top:15px;
+}
+svg line, svg circle {
+  stroke:#e5e7eb;
+  stroke-width:4;
+  fill:none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="game" id="gameContainer">
+  <h1 id="gameTitle">Hang Man</h1>
+
+  <div class="meaning" id="meaning"></div>
+
+  <!-- Classic Hangman with body -->
+  <svg width="150" height="220">
+    <!-- Gallows -->
+    <line x1="20" y1="200" x2="130" y2="200"/>
+    <line x1="40" y1="200" x2="40" y2="20"/>
+    <line x1="40" y1="20" x2="100" y2="20"/>
+    <line x1="100" y1="20" x2="100" y2="40"/>
+
+    <!-- Stickman -->
+    <circle id="head" cx="100" cy="55" r="15"/>
+    <line id="body" x1="100" y1="70" x2="100" y2="120"/>
+    <line id="left-hand" x1="100" y1="80" x2="80" y2="100"/>
+    <line id="right-hand" x1="100" y1="80" x2="120" y2="100"/>
+    <line id="left-leg" x1="100" y1="120" x2="80" y2="150"/>
+    <line id="right-leg" x1="100" y1="120" x2="120" y2="150"/>
+  </svg>
+
+  <div class="word" id="word"></div>
+
+  <select id="fontSelector">
+    <option value="'Segoe UI', Tahoma, Geneva, Verdana, sans-serif">Segoe UI</option>
+    <option value="'Courier New', Courier, monospace">Courier</option>
+    <option value="'Georgia', serif">Georgia</option>
+    <option value="'Lucida Console', monospace">Lucida Console</option>
+    <option value="'Verdana', sans-serif">Verdana</option>
+    <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
+    <option value="'Impact', sans-serif">Impact</option>
+    <option value="'Times New Roman', serif">Times New Roman</option>
+    <option value="'Comic Sans MS', cursive">Comic Sans</option>
+    <option value="'Palatino Linotype', serif">Palatino</option>
+  </select>
+
+  <div class="letters" id="letters"></div>
+  <div class="status" id="status"></div>
+
+  <button onclick="startGame()" style="margin-top:15px;background:#38bdf8;color:#020617;">New Word</button>
+  <div class="note">Note: There is a small chance the same word may appear again.</div>
+</div>
+
+<script>
+const WORDS = [
+{word:"articulate",meaning:"Able to express clearly"},
+{word:"benevolent",meaning:"Kindly, generous"},
+{word:"convoluted",meaning:"Extremely complex"},
+{word:"diligent",meaning:"Hardworking, careful"},
+{word:"elusive",meaning:"Hard to find or understand"},
+{word:"frugal",meaning:"Economical, thrifty"},
+{word:"humble",meaning:"Modest"},
+{word:"integrity",meaning:"Honesty, strong moral principles"},
+{word:"jaded",meaning:"Worn out, tired"},
+{word:"keen",meaning:"Sharp, perceptive"},
+{word:"lucid",meaning:"Clear and easy to understand"},
+{word:"meticulous",meaning:"Showing great attention to detail"},
+{word:"novel",meaning:"New, original"},
+{word:"obstinate",meaning:"Stubborn, unyielding"},
+{word:"prudent",meaning:"Careful and wise"},
+{word:"quaint",meaning:"Charmingly old-fashioned"},
+{word:"resilient",meaning:"Able to recover quickly"},
+{word:"scrutinize",meaning:"Examine carefully"},
+{word:"tenacious",meaning:"Persistent, determined"},
+{word:"unassuming",meaning:"Modest, not pretentious"},
+{word:"vigilant",meaning:"Alert, watchful"},
+{word:"wary",meaning:"Cautious, alert"},
+{word:"yearn",meaning:"To long for, desire"},
+{word:"zealous",meaning:"Enthusiastic, passionate"},
+{word:"affable",meaning:"Friendly, easy to talk to"},
+{word:"belligerent",meaning:"Hostile, aggressive"},
+{word:"candid",meaning:"Truthful and straightforward"},
+{word:"daunting",meaning:"Intimidating, challenging"},
+{word:"eclectic",meaning:"Deriving ideas from diverse sources"},
+{word:"fervent",meaning:"Passionate, intense"}
+];
+
+// Classic order: arms & legs first, then body & head
+let word="", display=[], wrong=0;
+const parts=["left-leg","right-leg","left-hand","right-hand","body","head"];
+
+const meaningEl=document.getElementById("meaning");
+const wordEl=document.getElementById("word");
+const lettersEl=document.getElementById("letters");
+const statusEl=document.getElementById("status");
+const fontSelector=document.getElementById("fontSelector");
+const gameTitle=document.getElementById("gameTitle");
+
+fontSelector.addEventListener("change",()=>{
+  gameTitle.style.fontFamily = fontSelector.value;
+  meaningEl.style.fontFamily = fontSelector.value;
+  wordEl.style.fontFamily = fontSelector.value;
+  lettersEl.style.fontFamily = fontSelector.value;
+});
+
+function startGame(){
+  const pick=WORDS[Math.floor(Math.random()*WORDS.length)];
+  word=pick.word.toUpperCase();
+  display=Array(word.length).fill("_");
+  wrong=0;
+  meaningEl.textContent="Meaning: "+pick.meaning;
+  statusEl.textContent="";
+  updateWord();
+  resetMan();
+  createLetters();
+}
+
+function updateWord(){ wordEl.textContent=display.join(""); }
+
+function createLetters(){
+  lettersEl.innerHTML="";
+  for(let i=65;i<=90;i++){
+    const b=document.createElement("button");
+    b.textContent=String.fromCharCode(i);
+    b.onclick=()=>guess(b.textContent,b);
+    lettersEl.appendChild(b);
+  }
+}
+
+function guess(l,b){
+  b.disabled=true;
+  let hit=false;
+  for(let i=0;i<word.length;i++){
+    if(word[i]===l){ display[i]=l; hit=true; }
+  }
+  hit ? updateWord() : cutPart();
+  checkEnd();
+}
+
+function cutPart(){
+  if(wrong<parts.length){
+    document.getElementById(parts[wrong]).style.display="none";
+    wrong++;
+  }
+}
+
+function checkEnd(){
+  if(!display.includes("_")){
+    statusEl.textContent="🎉 YOU WON!";
+    disableAll();
+  }
+  if(wrong===parts.length){
+    statusEl.textContent="💀 GAME OVER! Word: "+word;
+    disableAll();
+  }
+}
+
+function disableAll(){
+  document.querySelectorAll(".letters button").forEach(b=>b.disabled=true);
+}
+
+function resetMan(){
+  parts.forEach(p=>{
+    document.getElementById(p).style.display="block";
+  });
+}
+
+startGame();
+</script>
+
+</body>
+</html>
