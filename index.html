@@ -32,6 +32,27 @@ body.light {
   background: radial-gradient(circle at top, #cce0ff, #e6f0ff 70%);
 }
 
+/* AURORA (NIGHT MODE ONLY) */
+#aurora {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(circle at 15% 25%, rgba(80,120,255,0.12), transparent 40%),
+    radial-gradient(circle at 85% 30%, rgba(120,255,200,0.08), transparent 45%),
+    radial-gradient(circle at 50% 85%, rgba(180,180,255,0.06), transparent 40%);
+  animation: auroraMove 25s linear infinite;
+  display: none;
+}
+
+body:not(.light) #aurora { display: block; }
+
+@keyframes auroraMove {
+  0% { transform: translate(0,0); }
+  50% { transform: translate(30px,-20px); }
+  100% { transform: translate(0,0); }
+}
+
 /* STARS */
 #stars {
   position: fixed;
@@ -44,10 +65,10 @@ body.light {
   background: white;
   border-radius: 50%;
   animation: twinkle 2s infinite alternate;
-  opacity: 0.05; /* subtle for day mode */
+  opacity: 0.05; /* subtle for day */
 }
 
-body:not(.light) .star { opacity: 0.8; } /* night mode full stars */
+body:not(.light) .star { opacity: 0.8; } /* night stars full opacity */
 
 @keyframes twinkle {
   from { opacity: 0.3; transform: scale(0.8); }
@@ -101,6 +122,8 @@ header p {
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+  background: rgba(255,255,255,0.85);
+  color: #111;
 }
 
 /* MAIN */
@@ -178,6 +201,7 @@ footer {
 
 <body>
 
+<div id="aurora"></div>
 <div id="stars"></div>
 
 <header>
@@ -217,7 +241,7 @@ footer {
 <a href="./tic-tac-toe/index.html" class="game-btn" data-game="tictactoe">
   <span class="icon">❌</span>
   <span class="title">Tic Tac Toe</span>
-  <span class="meta">🎯 Easy · 👥 2P·🤖Computer</span>
+  <span class="meta">🎯 Easy · 👥 2P·Computer</span>
 </a>
 
 <a href="./clicker/index.html" class="game-btn" data-game="clicker">
