@@ -4,70 +4,57 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Game Hub</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron&family=Merriweather&family=Pacifico&family=Playfair+Display&family=Comic+Neue&family=Indie+Flower&family=Permanent+Marker&family=Fredoka+One&family=Luckiest+Guy&family=Baloo+2&family=Righteous&family=Cinzel&family=Acme&family=Rock+Salt&family=Kaushan+Script&family=Bangers&family=Lobster&family=VT323&family=Roboto+Slab&family=Inconsolata&display=swap" rel="stylesheet">
 
 <style>
-/* ================= RESET & BASE ================= */
 * { box-sizing: border-box; }
+
+:root { --ui-font: 'Orbitron', sans-serif; }
 
 body {
   margin: 0;
   min-height: 100vh;
-  font-family: "Orbitron", "Segoe UI", sans-serif; /* MAIN UI FONT */
+  font-family: var(--ui-font);
   color: #eaeaea;
   background: radial-gradient(circle at top, #0b0f1a, #05070c 70%);
   display: flex;
   flex-direction: column;
   align-items: center;
   overflow-x: hidden;
-  cursor: default; /* default cursor */
+  transition: background 0.5s ease, color 0.5s ease;
+  position: relative;
 }
 
-/* ================= AURORA BACKGROUND ================= */
-#aurora {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  background:
-    radial-gradient(circle at 15% 25%, rgba(80,120,255,0.12), transparent 40%),
-    radial-gradient(circle at 85% 30%, rgba(120,255,200,0.08), transparent 45%),
-    radial-gradient(circle at 50% 85%, rgba(180,180,255,0.06), transparent 40%);
-  animation: auroraMove 25s linear infinite;
+/* LIGHT MODE */
+body.light {
+  color: #111;
+  background: radial-gradient(circle at top, #cce0ff, #e6f0ff 70%);
 }
 
-@keyframes auroraMove {
-  0% { transform: translate(0px, 0px); }
-  50% { transform: translate(30px, -20px); }
-  100% { transform: translate(0px, 0px); }
-}
-
-/* ================= STARS ================= */
+/* STARS */
 #stars {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   z-index: -2;
-  pointer-events: none;
 }
 
 .star {
   position: absolute;
-  width: 2px;
-  height: 2px;
   background: white;
   border-radius: 50%;
-  opacity: 0.8;
   animation: twinkle 2s infinite alternate;
+  opacity: 0.05; /* subtle for day mode */
 }
+
+body:not(.light) .star { opacity: 0.8; } /* night mode full stars */
 
 @keyframes twinkle {
-  0% { opacity: 0.3; transform: scale(0.8); }
-  100% { opacity: 1; transform: scale(1.2); }
+  from { opacity: 0.3; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1.2); }
 }
 
-/* ================= HEADER ================= */
+/* HEADER */
 header {
   margin-top: 70px;
   text-align: center;
@@ -75,24 +62,52 @@ header {
 
 header h1 {
   font-size: 3.2rem;
-  margin: 0;
   letter-spacing: 3px;
-  color: #ffffff;
   text-shadow: 0 0 25px rgba(120,150,255,0.35);
 }
 
 header p {
-  margin-top: 12px;
-  font-size: 1.05rem;
-  color: #d7e9ff;
-  opacity: 0.85;
+  margin-top: 10px;
+  opacity: 0.8;
 }
 
-/* ================= MAIN ================= */
+/* CONTROLS */
+.controls {
+  margin-top: 18px;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+}
+
+/* THEME BUTTON */
+#themeToggle {
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.3);
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+/* FONT SELECTOR */
+#fontSelect {
+  padding: 8px 14px;
+  border-radius: 22px;
+  border: 1px solid rgba(255,255,255,0.12);
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+}
+
+/* MAIN */
 .main {
   width: 100%;
   max-width: 1100px;
-  margin: 60px auto 40px;
+  margin: 60px auto;
   padding: 0 22px;
 }
 
@@ -102,150 +117,214 @@ header p {
   gap: 32px;
 }
 
-/* ================= GAME CARDS ================= */
+/* GAME CARD */
 .game-btn {
   position: relative;
   padding: 30px 22px;
-  text-decoration: none;
   border-radius: 22px;
+  text-decoration: none;
+  color: inherit;
   background: linear-gradient(160deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
   backdrop-filter: blur(14px);
   border: 1px solid rgba(255,255,255,0.12);
-  color: #fff;
   text-align: center;
   box-shadow: 0 20px 50px rgba(0,0,0,0.75);
   transition: all 0.35s ease;
 }
 
-.game-btn::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: linear-gradient(120deg, transparent, rgba(255,255,255,0.25), transparent);
-  opacity: 0;
-  transition: opacity 0.35s ease;
-}
-
-.game-btn span.icon {
-  font-size: 2.4rem;
-  display: block;
-  margin-bottom: 14px;
-}
-
-.game-btn span.title {
-  font-size: 1.15rem;
-  font-weight: 600;
-  letter-spacing: 0.6px;
-}
-
 .game-btn:hover {
   transform: translateY(-10px) scale(1.04);
-  box-shadow: 0 28px 70px rgba(0,0,0,0.65);
 }
 
-.game-btn:hover::after { opacity: 1; }
+.icon {
+  font-size: 2.4rem;
+  display: block;
+  margin-bottom: 12px;
+}
 
-/* ================= FOOTER ================= */
+.title {
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.meta {
+  margin-top: 8px;
+  font-size: 0.75rem;
+  opacity: 0.75;
+}
+
+.plays {
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  font-size: 0.65rem;
+  opacity: 0.6;
+}
+
+/* FOOTER */
 footer {
   margin-top: auto;
-  padding: 22px 0 26px;
-  font-size: 0.9rem;
-  font-family: "Inter", "Segoe UI", sans-serif; /* Footer font unchanged */
-  color: rgba(255,255,255,0.7);
-  letter-spacing: 0.8px;
+  padding: 22px;
+  font-size: 0.85rem;
+  opacity: 0.7;
 }
 
-footer span {
-  opacity: 0.8;
-  font-style: italic;
-}
-
-/* ================= RESPONSIVE ================= */
+/* RESPONSIVE */
 @media (max-width: 520px) {
   header h1 { font-size: 2.6rem; }
-  .game-btn { padding: 24px 18px; }
 }
 </style>
 </head>
+
 <body>
 
-<div id="aurora"></div>
 <div id="stars"></div>
 
 <header>
   <h1>🎮 Game Hub</h1>
   <p>Made due to boredom… somehow turned into this ✨</p>
+
+  <div class="controls">
+    <button id="themeToggle">🌙</button>
+    <select id="fontSelect">
+      <option value="Orbitron">Orbitron</option>
+      <option value="Merriweather">Merriweather</option>
+      <option value="Pacifico">Pacifico</option>
+      <option value="Playfair Display">Playfair Display</option>
+      <option value="Comic Neue">Comic Neue</option>
+      <option value="Indie Flower">Indie Flower</option>
+      <option value="Permanent Marker">Permanent Marker</option>
+      <option value="Fredoka One">Fredoka One</option>
+      <option value="Luckiest Guy">Luckiest Guy</option>
+      <option value="Baloo 2">Baloo 2</option>
+      <option value="Righteous">Righteous</option>
+      <option value="Cinzel">Cinzel</option>
+      <option value="Acme">Acme</option>
+      <option value="Rock Salt">Rock Salt</option>
+      <option value="Kaushan Script">Kaushan Script</option>
+      <option value="Bangers">Bangers</option>
+      <option value="Lobster">Lobster</option>
+      <option value="VT323">VT323</option>
+      <option value="Roboto Slab">Roboto Slab</option>
+      <option value="Inconsolata">Inconsolata</option>
+    </select>
+  </div>
 </header>
 
 <main class="main">
-  <section class="game-grid">
+<section class="game-grid">
 
-    <a href="./tic-tac-toe/index.html" class="game-btn">
-      <span class="icon">❌</span>
-      <span class="title">Tic Tac Toe</span>
-    </a>
+<a href="./tic-tac-toe/index.html" class="game-btn" data-game="tictactoe">
+  <span class="icon">❌</span>
+  <span class="title">Tic Tac Toe</span>
+  <span class="meta">🎯 Easy · 👥 2P·🤖Computer</span>
+</a>
 
-    <a href="./clicker/index.html" class="game-btn">
-      <span class="icon">🖱️</span>
-      <span class="title">Clicker</span>
-    </a>
+<a href="./clicker/index.html" class="game-btn" data-game="clicker">
+  <span class="icon">🖱️</span>
+  <span class="title">Clicker Game</span>
+  <span class="meta">⏰ Quick · Relax</span>
+</a>
 
-    <a href="./hand-cricket/index.html" class="game-btn">
-      <span class="icon">🏏</span>
-      <span class="title">Hand Cricket</span>
-    </a>
+<a href="./hand-cricket/index.html" class="game-btn" data-game="handcricket">
+  <span class="icon">🏏</span>
+  <span class="title">Hand Cricket</span>
+  <span class="meta">🎯 Medium · Sports</span>
+</a>
 
-    <a href="./rock-paper-scissors/index.html" class="game-btn">
-      <span class="icon">🪨</span>
-      <span class="title">Rock Paper Scissors</span>
-    </a>
+<a href="./rock-paper-scissors/index.html" class="game-btn" data-game="rps">
+  <span class="icon">🪨</span>
+  <span class="title">Rock Paper Scissors</span>
+  <span class="meta">⚡ Fast · Luck</span>
+</a>
 
-    <a href="./Space Rush/index.html" class="game-btn">
-      <span class="icon">🚀</span>
-      <span class="title">Space Rush</span>
-    </a>
+<a href="./Space Rush/index.html" class="game-btn" data-game="spacerush">
+  <span class="icon">🚀</span>
+  <span class="title">Space Rush</span>
+  <span class="meta">🔥 Hard · Arcade</span>
+</a>
 
-    <a href="./2P-Tank-Arena/index.html" class="game-btn">
-      <span class="icon">🛡️</span>
-      <span class="title">2P Tank Arena</span>
-    </a>
+<a href="./2P-Tank-Arena/index.html" class="game-btn" data-game="tank">
+  <span class="icon">🛡️</span>
+  <span class="title">2P Tank Arena</span>
+  <span class="meta">👥 Multiplayer</span>
+</a>
 
-    <a href="./Maze-Escape/index.html" class="game-btn">
-      <span class="icon">🧩</span>
-      <span class="title">Maze Escape</span>
-    </a>
+<a href="./Maze-Escape/index.html" class="game-btn" data-game="maze">
+  <span class="icon">🧩</span>
+  <span class="title">Maze Escape</span>
+  <span class="meta">🧠 Puzzle</span>
+</a>
 
-     <a href="./Hang-Man/index.html" class="game-btn">
-      <span class="icon">💀</span>
-      <span class="title">Hang Man</span>
-    </a>
+<a href="./Hang-Man/index.html" class="game-btn" data-game="hangman">
+  <span class="icon">💀</span>
+  <span class="title">Hang Man</span>
+  <span class="meta">✍️ Word Game</span>
+</a>
 
-  </section>
+</section>
 </main>
 
 <footer>
-  <span>Built by BetterThanYouBro⚡</span>
+  Built by BetterThanYouBro ⚡
 </footer>
 
 <script>
-// Generate stars
-const starCount = 100;
-const starsContainer = document.getElementById('stars');
-for (let i = 0; i < starCount; i++) {
-  const star = document.createElement('div');
-  star.classList.add('star');
-  star.style.top = Math.random() * 100 + '%';
-  star.style.left = Math.random() * 100 + '%';
-  star.style.width = Math.random() * 2 + 1 + 'px';
-  star.style.height = star.style.width;
-  star.style.animationDuration = (Math.random() * 3 + 1) + 's';
-  starsContainer.appendChild(star);
+/* STARS */
+const stars = document.getElementById("stars");
+for (let i = 0; i < 100; i++) {
+  const s = document.createElement("div");
+  s.className = "star";
+  const size = Math.random() * 2 + 1;
+  s.style.width = s.style.height = size + "px";
+  s.style.top = Math.random() * 100 + "%";
+  s.style.left = Math.random() * 100 + "%";
+  s.style.animationDuration = Math.random() * 3 + 1 + "s";
+  stars.appendChild(s);
 }
+
+/* THEME */
+const toggle = document.getElementById("themeToggle");
+const fontSelect = document.getElementById("fontSelect");
+
+function setTheme(isLight) {
+  document.body.classList.toggle("light", isLight);
+  toggle.textContent = isLight ? "☀️" : "🌙";
+  fontSelect.style.background = isLight ? "rgba(255,255,255,0.85)" : "rgba(15,20,40,0.85)";
+  fontSelect.style.color = isLight ? "#111" : "#eaeaea";
+  localStorage.setItem("theme", isLight ? "light" : "dark");
+}
+
+setTheme(localStorage.getItem("theme") === "light");
+
+toggle.onclick = () => {
+  setTheme(!document.body.classList.contains("light"));
+};
+
+/* FONT CHANGER */
+function setFont(font) {
+  document.documentElement.style.setProperty("--ui-font", `'${font}', sans-serif`);
+  localStorage.setItem("font", font);
+  fontSelect.value = font;
+}
+const savedFont = localStorage.getItem("font") || "Orbitron";
+setFont(savedFont);
+
+fontSelect.addEventListener("change", e => setFont(e.target.value));
+
+/* PLAY COUNT */
+document.querySelectorAll(".game-btn").forEach(btn => {
+  const key = btn.dataset.game + "_plays";
+  let count = localStorage.getItem(key) || 0;
+  const badge = document.createElement("span");
+  badge.className = "plays";
+  badge.textContent = "▶ " + count;
+  btn.appendChild(badge);
+  btn.addEventListener("click", () => {
+    localStorage.setItem(key, Number(count) + 1);
+  });
+});
 </script>
 
 </body>
 </html>
-
-
-
