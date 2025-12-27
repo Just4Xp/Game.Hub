@@ -192,6 +192,25 @@ footer {
   opacity: 0.7;
 }
 
+/* ONLY “BetterThanYouBro” STEPPED GRADIENT */
+.gradient-text {
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: inherit;
+  background: linear-gradient(270deg, #ff00ff, #ff8c00, #00ffff, #ff00ff);
+  background-size: 400% 400%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientStep 4s ease infinite;
+}
+
+@keyframes gradientStep {
+  0% { background-position: 0% 50%; }
+  33% { background-position: 100% 50%; }
+  66% { background-position: 200% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
 /* RESPONSIVE */
 @media (max-width: 520px) {
   header h1 { font-size: 2.6rem; }
@@ -290,7 +309,12 @@ footer {
 </main>
 
 <footer>
- <center> <br> <small>  Credits: Paradox & Homies </small> </br> Built by BetterThanYouBro ⚡</center>
+  <center>
+    <br>
+    <small>Credits: Paradox & Homies</small>
+    <br>
+    Built by <span class="gradient-text"> BetterThanYouBro ⚡</span>
+  </center>
 </footer>
 
 <script>
@@ -352,8 +376,3 @@ document.querySelectorAll(".game-btn").forEach(btn => {
 
 </body>
 </html>
-
-
-
-
-
