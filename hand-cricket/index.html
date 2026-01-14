@@ -3,223 +3,299 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hand Cricket (1–10)</title>
+<title>🏏 Hand Cricket </title>
 
 <style>
-/* ===== BODY & GENERAL ===== */
+/* ===== GLOBAL FIXES (NO FLASH / NO WEIRD TEXT) ===== */
+* {
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+button:focus { outline: none; }
+
+/* ===== THEME ===== */
+:root {
+  --bg: linear-gradient(135deg, #e0eafc, #cfdef3);
+  --card: rgba(255,255,255,0.78);
+  --text: #222;
+  --accent: #1976d2;
+  --btn: linear-gradient(135deg, #1976d2, #42a5f5);
+}
+
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    text-align: center;
-    background: linear-gradient(135deg, #1e3c72, #2a5298);
-    color: #f0f0f0;
-    padding: 20px;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* ===== HEADINGS ===== */
-h1 {
-    color: #ffd700;
-    margin-bottom: 10px;
-    text-shadow: 2px 2px #00000044;
+.game-card {
+  background: var(--card);
+  backdrop-filter: blur(12px);
+  border-radius: 22px;
+  padding: 25px;
+  width: 95%;
+  max-width: 520px;
+  box-shadow: 0 20px 45px rgba(0,0,0,0.25);
+  text-align: center;
+  animation: pop 0.4s ease;
 }
 
-h3 {
-    margin-top: 20px;
-    color: #ffffffcc;
+@keyframes pop {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
 }
 
-/* ===== BUTTONS ===== */
-button {
-    padding: 12px 20px;
-    margin: 6px;
-    font-size: 18px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: 0.2s;
-    min-width: 50px;
-    max-width: 60px;
+/* ===== SCOREBOARD ===== */
+.scoreboard {
+  display: flex;
+  justify-content: space-between;
+  margin: 15px 0;
+  font-size: 16px;
 }
 
+/* ===== CONTROLS ===== */
+.controls {
+  margin-bottom: 10px;
+}
+.controls button {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 12px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* ===== NUMBER BUTTONS ===== */
+#buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 15px 0;
+}
 #buttons button {
-    background: #ff9800;
-    color: white;
+  background: var(--btn);
+  color: white;
+  border: none;
+  margin: 6px;
+  width: 55px;
+  height: 55px;
+  border-radius: 14px;
+  font-size: 18px;
+  cursor: pointer;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+#buttons button:active {
+  transform: scale(0.85);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
 }
 
-#buttons button:hover {
-    background: #e68a00;
-}
-
-#backButton {
-    background: #2196F3;
-    color: white;
-    min-width: 120px;
-    margin-top: 10px;
-}
-
-#backButton:hover {
-    background: #1976D2;
-}
-
-#restartButton {
-    background: #4CAF50;
-    color: white;
-    min-width: 120px;
-    margin-top: 10px;
-}
-
-#restartButton:hover {
-    background: #43a047;
-}
-
-/* ===== LOG BOX ===== */
+/* ===== LOG ===== */
 #log {
-    margin-top: 20px;
-    white-space: pre-line;
-    font-size: 18px;
-    padding: 20px;
-    width: 90%;
-    max-width: 500px;
-    background: rgba(255, 255, 255, 0.15);
-    border-radius: 12px;
-    min-height: 180px;
-    overflow-y: auto;
-    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+  margin-top: 15px;
+  padding: 15px;
+  background: rgba(0,0,0,0.08);
+  border-radius: 14px;
+  min-height: 150px;
+  font-size: 15px;
+  white-space: pre-line;
+  overflow-y: auto;
+}
+.flash {
+  animation: flash 0.5s ease;
+}
+@keyframes flash {
+  from { background-color: rgba(25,118,210,0.25); }
+  to { background-color: rgba(0,0,0,0.08); }
 }
 
-/* ===== INSTRUCTIONS ===== */
-#instructions {
-    background: rgba(255,255,255,0.1);
-    padding: 10px 15px;
-    border-radius: 8px;
-    margin-top: 15px;
-    max-width: 500px;
-    text-align: center;
-    color: #ffffffcc;
+/* ===== MODAL ===== */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.modal-content {
+  background: white;
+  padding: 25px;
+  border-radius: 18px;
+  width: 90%;
+  max-width: 320px;
+  text-align: center;
+  animation: slideUp 0.35s ease;
+}
+@keyframes slideUp {
+  from { transform: translateY(40px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.modal-content button {
+  margin: 8px;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  cursor: pointer;
+  background: var(--accent);
+  color: white;
 }
 </style>
 </head>
+
 <body>
 
-<h1>🏏 Hand Cricket</h1>
-<p>Select a number between <strong>1 and 10</strong> to play.</p>
+<div class="game-card">
+  <h1>🏏 Hand Cricket</h1>
 
-<div id="buttons"></div>
-<div id="log"></div>
+  <div class="scoreboard">
+    <div>🧍 You: <span id="userScore">0</span></div>
+    <div>🤖 CPU: <span id="compScore">0</span></div>
+    <div>🎮 <span id="phase">Batting</span></div>
+  </div>
 
-<div id="instructions">
-    <h3>HOW TO PLAY:</h3>
-    <p>Choose a number. If it matches the computer's number, you're out or take a wicket. Try to beat the computer!</p>
+  <div class="controls">
+    <button onclick="restartGame()">🔄 Restart</button>
+  </div>
+
+  <div id="buttons"></div>
+  <div id="log"></div>
 </div>
 
-<!-- Buttons -->
-<button id="restartButton">🔄 Restart</button>
-<button id="backButton">⬅ Back to Hub</button>
+<!-- MODAL -->
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <h2 id="modalTitle"></h2>
+    <p id="modalText"></p>
+    <button id="modalPrimary"></button>
+    <button id="modalSecondary" style="display:none;"></button>
+  </div>
+</div>
 
 <script>
-let userScore = 0;
-let compScore = 0;
-let phase = "batting"; // batting → bowling
+let userScore = 0, compScore = 0;
+let phase = "batting";
+let gameOver = false;
+let userHistory = [];
 
-function log(msg) {
-    const logBox = document.getElementById("log");
-    logBox.innerText += msg + "\n";
-    logBox.scrollTop = logBox.scrollHeight; // auto scroll
+const logBox = document.getElementById("log");
+const modal = document.getElementById("modal");
+const modalTitle = document.getElementById("modalTitle");
+const modalText = document.getElementById("modalText");
+const modalPrimary = document.getElementById("modalPrimary");
+const modalSecondary = document.getElementById("modalSecondary");
+const userScoreEl = document.getElementById("userScore");
+const compScoreEl = document.getElementById("compScore");
+const phaseEl = document.getElementById("phase");
+
+function updateUI() {
+  userScoreEl.textContent = userScore;
+  compScoreEl.textContent = compScore;
+  phaseEl.textContent = phase.charAt(0).toUpperCase() + phase.slice(1);
 }
 
+function log(msg) {
+  logBox.innerText += msg + "\n";
+  logBox.scrollTop = logBox.scrollHeight;
+  logBox.classList.add("flash");
+  setTimeout(() => logBox.classList.remove("flash"), 250);
+}
+
+/* ===== SMART CPU ===== */
 function compChoice() {
-    return Math.floor(Math.random() * 10) + 1;
+  if (userHistory.length >= 3) {
+    const a = userHistory.slice(-3);
+    if (a.every(n => n === a[0])) return a[0];                    // spam
+    if (a[1] === a[0] + 1 && a[2] === a[1] + 1) return Math.min(a[2] + 1, 10); // sequence
+    if (a.every(n => n % 2 === a[0] % 2)) return a[2] % 2 === 0 ? 2 : 3;       // odd/even
+  }
+  if (userHistory.length >= 5) {
+    const freq = {};
+    userHistory.forEach(n => freq[n] = (freq[n] || 0) + 1);
+    const max = Object.keys(freq).reduce((a,b)=>freq[a]>freq[b]?a:b);
+    if (Math.random() < 0.6) return Number(max);
+  }
+  return Math.floor(Math.random() * 10) + 1;
 }
 
 function play(num) {
-    let comp = compChoice();
-    log(`You: ${num} | Computer: ${comp}`);
+  if (gameOver) return;
 
-    if (phase === "batting") {
-        if (num === comp) {
-            log("❌ You are OUT!");
-            log(`Your Total Score: ${userScore}\n`);
-            log("🎯 Bowling Time! Try to stop the computer.\n");
-            phase = "bowling";
-            return;
-        }
-        userScore += num;
-        log(`Your Score: ${userScore}`);
-    } else {
-        if (num === comp) {
-            log("🎉 You got the wicket!");
-            log(`Computer Final Score: ${compScore}`);
-            endGame();
-            return;
-        }
-        compScore += comp;
-        log(`Computer Score: ${compScore}`);
+  const comp = compChoice();
+  userHistory.push(num);
 
-        if (compScore > userScore) {
-            endGame();
-        }
+  log(`You: ${num} | CPU: ${comp}`);
+
+  if (phase === "batting") {
+    if (num === comp) showOutPopup();
+    else userScore += num;
+  } else {
+    if (num === comp) endGame(true);
+    else {
+      compScore += comp;
+      if (compScore > userScore) endGame(false);
     }
+  }
+  updateUI();
 }
 
-function endGame() {
-    if (compScore > userScore) log("\n💥 Computer Wins!");
-    else if (compScore < userScore) log("\n🎉 You Win!");
-    else log("\n🤝 It's a Tie!");
+function showOutPopup() {
+  modal.style.display = "flex";
+  modalTitle.textContent = "❌ You are OUT!";
+  modalText.textContent = `Your Score: ${userScore}`;
+  modalPrimary.textContent = "Start Bowling";
+  modalSecondary.textContent = "Restart";
+  modalSecondary.style.display = "inline-block";
+
+  modalPrimary.onclick = () => {
+    modal.style.display = "none";
+    phase = "bowling";
+    updateUI();
+    log("\n🎯 Bowling Time!\n");
+  };
+  modalSecondary.onclick = restartGame;
+}
+
+function endGame(playerWon) {
+  gameOver = true;
+  modal.style.display = "flex";
+  modalSecondary.style.display = "none";
+  modalPrimary.textContent = "Restart";
+  modalTitle.textContent = playerWon ? "🏆 YOU WIN!" : "💥 COMPUTER WINS!";
+  modalText.textContent = playerWon ? "Great play!" : "CPU read your pattern!";
+  modalPrimary.onclick = restartGame;
 }
 
 function restartGame() {
-    userScore = 0;
-    compScore = 0;
-    phase = "batting";
-    document.getElementById("log").innerText = "";
-    log("🔄 Game restarted. Start batting!");
+  modal.style.display = "none";
+  userScore = 0;
+  compScore = 0;
+  phase = "batting";
+  gameOver = false;
+  userHistory = [];
+  logBox.innerText = "🔄 New Game Started!\n";
+  updateUI();
 }
 
-window.onload = () => {
-    let container = document.getElementById("buttons");
-    for (let i = 1; i <= 10; i++) {
-        let btn = document.createElement("button");
-        btn.textContent = i;
-        btn.onclick = () => play(i);
-        container.appendChild(btn);
-    }
-};
+/* INIT */
+const btnContainer = document.getElementById("buttons");
+for (let i = 1; i <= 10; i++) {
+  const b = document.createElement("button");
+  b.textContent = i;
+  b.onclick = () => play(i);
+  btnContainer.appendChild(b);
+}
 
-// Back to Hub
-document.getElementById("backButton").addEventListener("click", () => {
-    location.href = "../index.html"; // adjust path if hub is elsewhere
-});
-
-// Restart
-document.getElementById("restartButton").addEventListener("click", restartGame);
+log("🎮 Start Batting!");
 </script>
-<script>
-  // Disable right-click
-  document.addEventListener('contextmenu', function(e) {
-    e.preventDefault();
-  });
 
-  // Disable common DevTools shortcuts
-  document.addEventListener('keydown', function(e) {
-    // F12
-    if (e.key === "F12") e.preventDefault();
-
-    // Ctrl+Shift+I or Ctrl+Shift+J
-    if (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "J")) e.preventDefault();
-
-    // Ctrl+U (view source)
-    if (e.ctrlKey && e.key === "u") e.preventDefault();
-
-    // Ctrl+Shift+C (inspect element)
-    if (e.ctrlKey && e.shiftKey && e.key === "C") e.preventDefault();
-  });
-
-  // Optional: prevent text selection and copy (extra protection)
-  document.addEventListener('copy', function(e) { e.preventDefault(); });
-  document.addEventListener('selectstart', function(e) { e.preventDefault(); });
-</script>
 </body>
 </html>
