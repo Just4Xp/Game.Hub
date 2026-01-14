@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Game Hub</title>
 
+<!-- GOOGLE FONTS -->
 <link href="https://fonts.googleapis.com/css2?family=Orbitron&family=Merriweather&family=Pacifico&family=Playfair+Display&family=Comic+Neue&family=Indie+Flower&family=Permanent+Marker&family=Fredoka+One&family=Luckiest+Guy&family=Baloo+2&family=Righteous&family=Cinzel&family=Acme&family=Rock+Salt&family=Kaushan+Script&family=Bangers&family=Lobster&family=VT323&family=Roboto+Slab&family=Inconsolata&display=swap" rel="stylesheet">
 
 <style>
 * { box-sizing: border-box; }
-
 :root { --ui-font: 'Orbitron', sans-serif; }
 
 body {
@@ -32,7 +32,44 @@ body.light {
   background: radial-gradient(circle at top, #cce0ff, #e6f0ff 70%);
 }
 
-/* AURORA (NIGHT MODE ONLY) */
+/* ===== LOADING SCREEN ===== */
+#loading-screen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+#loading-screen span {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+#progress-container {
+  width: 70%;
+  max-width: 400px;
+  height: 14px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(255,255,255,0.2);
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+#progress-bar {
+  height: 100%;
+  width: 0%;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #1976d2, #42a5f5);
+  animation: shimmer 1.5s linear infinite;
+  background-size: 200% 100%;
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* HUB STYLES */
 #aurora {
   position: fixed;
   inset: 0;
@@ -44,103 +81,45 @@ body.light {
   animation: auroraMove 25s linear infinite;
   display: none;
 }
-
 body:not(.light) #aurora { display: block; }
-
-@keyframes auroraMove {
-  0% { transform: translate(0,0); }
-  50% { transform: translate(30px,-20px); }
-  100% { transform: translate(0,0); }
-}
+@keyframes auroraMove { 0% { transform: translate(0,0); } 50% { transform: translate(30px,-20px); } 100% { transform: translate(0,0); } }
 
 /* STARS */
-#stars {
-  position: fixed;
-  inset: 0;
-  z-index: -2;
-}
-
-.star {
-  position: absolute;
-  background: white;
-  border-radius: 50%;
-  animation: twinkle 2s infinite alternate;
-  opacity: 0.05; /* subtle for day */
-}
-
-body:not(.light) .star { opacity: 0.8; } /* night stars full opacity */
-
-@keyframes twinkle {
-  from { opacity: 0.3; transform: scale(0.8); }
-  to { opacity: 1; transform: scale(1.2); }
-}
+#stars { position: fixed; inset:0; z-index:-2; }
+.star { position: absolute; background: white; border-radius:50%; animation: twinkle 2s infinite alternate; opacity:0.05; }
+body:not(.light) .star { opacity:0.8; }
+@keyframes twinkle { from{opacity:0.3; transform:scale(0.8);} to{opacity:1; transform:scale(1.2);} }
 
 /* HEADER */
-header {
-  margin-top: 70px;
-  text-align: center;
-}
-
-header h1 {
-  font-size: 3.2rem;
-  letter-spacing: 3px;
-  text-shadow: 0 0 25px rgba(120,150,255,0.35);
-}
-
-header p {
-  margin-top: 10px;
-  opacity: 0.8;
-}
+header { margin-top: 70px; text-align:center; }
+header h1 { font-size:3.2rem; letter-spacing:3px; text-shadow:0 0 25px rgba(120,150,255,0.35); }
+header p { margin-top:10px; opacity:0.8; }
 
 /* CONTROLS */
-.controls {
-  margin-top: 18px;
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  align-items: center;
-}
-
-/* THEME BUTTON */
-#themeToggle {
-  padding: 8px 16px;
-  border-radius: 20px;
-  border: 1px solid rgba(255,255,255,0.3);
-  background: none;
-  color: inherit;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: all 0.3s ease;
-}
-
-/* FONT SELECTOR */
-#fontSelect {
-  padding: 8px 14px;
-  border-radius: 22px;
-  border: 1px solid rgba(255,255,255,0.12);
-  font-family: inherit;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-  background: rgba(255,255,255,0.85);
-  color: #111;
-}
+.controls { margin-top:18px; display:flex; gap:10px; justify-content:center; align-items:center; }
+#themeToggle { padding:8px 16px; border-radius:20px; border:1px solid rgba(255,255,255,0.3); background:none; color:inherit; cursor:pointer; font-size:1rem; transition:all 0.3s ease; }
+#fontSelect { padding:8px 14px; border-radius:22px; border:1px solid rgba(255,255,255,0.12); font-family:inherit; cursor:pointer; transition:all 0.3s ease; box-shadow:0 10px 30px rgba(0,0,0,0.6); background:rgba(255,255,255,0.85); color:#111; }
 
 /* MAIN */
-.main {
-  width: 100%;
-  max-width: 1100px;
-  margin: 60px auto;
-  padding: 0 22px;
-}
-
+.main { width:100%; max-width:1100px; margin:60px auto; padding:0 22px; }
 .game-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  grid-template-columns: repeat(4, 1fr); /* max 4 buttons per row */
   gap: 32px;
 }
 
-/* GAME CARD */
+@media (max-width: 1000px) {
+  .game-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 700px) {
+  .game-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 500px) {
+  .game-grid { grid-template-columns: 1fr; }
+}
+/* GAME CARDS */
 .game-btn {
   position: relative;
   padding: 30px 22px;
@@ -154,283 +133,222 @@ header p {
   box-shadow: 0 20px 50px rgba(0,0,0,0.75);
   transition: all 0.35s ease;
 }
-
-.game-btn:hover {
-  transform: translateY(-10px) scale(1.04);
-}
-
-.icon {
-  font-size: 2.4rem;
-  display: block;
-  margin-bottom: 12px;
-}
-
-.title {
-  font-size: 1.15rem;
-  font-weight: 600;
-}
-
-.meta {
-  margin-top: 8px;
-  font-size: 0.75rem;
-  opacity: 0.75;
-}
-
-.plays {
-  position: absolute;
-  top: 14px;
-  right: 18px;
-  font-size: 0.65rem;
-  opacity: 0.6;
-}
+.game-btn:hover { transform: translateY(-10px) scale(1.04); }
+.icon { font-size:2.4rem; display:block; margin-bottom:12px; }
+.title { font-size:1.15rem; font-weight:600; }
+.meta { margin-top:8px; font-size:0.75rem; opacity:0.75; }
+.plays { position:absolute; top:14px; right:18px; font-size:0.65rem; opacity:0.6; }
 
 /* FOOTER */
-footer {
-  margin-top: auto;
-  padding: 22px;
-  font-size: 0.85rem;
-  opacity: 0.7;
-}
-
-/* ONLY “BetterThanYouBro” STEPPED GRADIENT */
-.gradient-text {
-  font-family: inherit;
-  font-size: 0.85rem;
-  font-weight: inherit;
-  background: linear-gradient(270deg, #ff00ff, #ff8c00, #00ffff, #ff00ff);
-  background-size: 400% 400%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: gradientStep 4s ease infinite;
-}
-
-@keyframes gradientStep {
-  0% { background-position: 0% 50%; }
-  33% { background-position: 100% 50%; }
-  66% { background-position: 200% 50%; }
-  100% { background-position: 0% 50%; }
-}
+footer { margin-top:auto; padding:22px; font-size:0.85rem; opacity:0.7; }
+.gradient-text { font-family:inherit; font-size:0.85rem; font-weight:inherit; background:linear-gradient(270deg,#ff00ff,#ff8c00,#00ffff,#ff00ff); background-size:400% 400%; -webkit-background-clip:text; -webkit-text-fill-color:transparent; animation:gradientStep 4s ease infinite; }
+@keyframes gradientStep { 0%{background-position:0% 50%;}33%{background-position:100% 50%;}66%{background-position:200% 50%;}100%{background-position:0% 50%;} }
 
 /* RESPONSIVE */
-@media (max-width: 520px) {
-  header h1 { font-size: 2.6rem; }
-}
+@media(max-width:520px){header h1{font-size:2.6rem;}}
 </style>
 </head>
-
 <body>
 
-<div id="aurora"></div>
-<div id="stars"></div>
-
-<header>
-  <h1>🎮 Game Hub</h1>
-  <p>How is it ;) </p><br> For better experience play on pc 💻
-
-  <div class="controls">
-    <button id="themeToggle">🌙</button>
-    <select id="fontSelect">
-      <option value="Orbitron">Orbitron</option>
-      <option value="Merriweather">Merriweather</option>
-      <option value="Pacifico">Pacifico</option>
-      <option value="Playfair Display">Playfair Display</option>
-      <option value="Comic Neue">Comic Neue</option>
-      <option value="Indie Flower">Indie Flower</option>
-      <option value="Permanent Marker">Permanent Marker</option>
-      <option value="Fredoka One">Fredoka One</option>
-      <option value="Luckiest Guy">Luckiest Guy</option>
-      <option value="Baloo 2">Baloo 2</option>
-      <option value="Righteous">Righteous</option>
-      <option value="Cinzel">Cinzel</option>
-      <option value="Acme">Acme</option>
-      <option value="Rock Salt">Rock Salt</option>
-      <option value="Kaushan Script">Kaushan Script</option>
-      <option value="Bangers">Bangers</option>
-      <option value="Lobster">Lobster</option>
-      <option value="VT323">VT323</option>
-      <option value="Roboto Slab">Roboto Slab</option>
-      <option value="Inconsolata">Inconsolata</option>
-    </select>
+<!-- LOADING SCREEN -->
+<div id="loading-screen">
+  <span>Loading Game Hub...</span>
+  <div id="progress-container">
+    <div id="progress-bar"></div>
   </div>
-</header>
+</div>
 
-<main class="main">
-<section class="game-grid">
+<!-- HUB CONTENT -->
+<div id="hub-content" style="display:none;">
+  <div id="aurora"></div>
+  <div id="stars"></div>
 
-<a href="./tic-tac-toe/index.html" class="game-btn" data-game="tictactoe">
-  <span class="icon">❌</span>
-  <span class="title"><center>Tic Tac Toe</center></span>
-  <span class="meta">🎯 Easy · 👥 2P·Computer</span>
-</a>
+  <header>
+    <h1>🎮 Game Hub</h1>
+    <p>How is it ;) </p><br> For better experience play on pc 💻
+    <div class="controls">
+      <button id="themeToggle">🌙</button>
+      <select id="fontSelect">
+        <option value="Orbitron">Orbitron</option>
+        <option value="Merriweather">Merriweather</option>
+        <option value="Pacifico">Pacifico</option>
+        <option value="Playfair Display">Playfair Display</option>
+        <option value="Comic Neue">Comic Neue</option>
+        <option value="Indie Flower">Indie Flower</option>
+        <option value="Permanent Marker">Permanent Marker</option>
+        <option value="Fredoka One">Fredoka One</option>
+        <option value="Luckiest Guy">Luckiest Guy</option>
+        <option value="Baloo 2">Baloo 2</option>
+        <option value="Righteous">Righteous</option>
+        <option value="Cinzel">Cinzel</option>
+        <option value="Acme">Acme</option>
+        <option value="Rock Salt">Rock Salt</option>
+        <option value="Kaushan Script">Kaushan Script</option>
+        <option value="Bangers">Bangers</option>
+        <option value="Lobster">Lobster</option>
+        <option value="VT323">VT323</option>
+        <option value="Roboto Slab">Roboto Slab</option>
+        <option value="Inconsolata">Inconsolata</option>
+      </select>
+    </div>
+  </header>
 
-<a href="./clicker/index.html" class="game-btn" data-game="clicker">
-  <span class="icon">🖱️</span>
-  <span class="title"><center>Clicker Game</center></span>
-  <span class="meta">⏰ Quick · Relax</span>
-</a>
+  <main class="main">
+    <section class="game-grid">
+      <!-- ALL GAME BUTTONS EXACTLY AS YOU HAD -->
+      <a href="./tic-tac-toe/index.html" class="game-btn" data-game="tictactoe">
+        <span class="icon">❌</span>
+        <span class="title"><center>Tic Tac Toe</center></span>
+        <span class="meta">🎯 Easy · 👥 2P·Computer</span>
+      </a>
+      <a href="./clicker/index.html" class="game-btn" data-game="clicker">
+        <span class="icon">🖱️</span>
+        <span class="title"><center>Clicker Game</center></span>
+        <span class="meta">⏰ Quick · Relax</span>
+      </a>
+      <a href="./hand-cricket/index.html" class="game-btn" data-game="handcricket">
+        <span class="icon">🏏</span>
+        <span class="title"><center>Hand Cricket</center></span>
+        <span class="meta">🎯 Medium · Sports</span>
+      </a>
+      <a href="./rock-paper-scissors/index.html" class="game-btn" data-game="rps">
+        <span class="icon">🪨📃✂️</span>
+        <span class="title"><center>R P S</center></span>
+        <span class="meta">⚡ Fast · Luck</span>
+      </a>
+      <a href="./Space-Rush/index.html" class="game-btn" data-game="spacerush">
+        <span class="icon">🚀</span>
+        <span class="title"><center>Space Rush</center></span>
+        <span class="meta">🔥 Hard · Arcade</span>
+      </a>
+      <a href="./2P-Tank-Arena/index.html" class="game-btn" data-game="tank">
+        <span class="icon">🛡️</span>
+        <span class="title"><center>2P Tank Arena</center></span>
+        <span class="meta">👥 Multiplayer</span>
+      </a>
+      <a href="./Maze-Escape/index.html" class="game-btn" data-game="maze">
+        <span class="icon">🧩</span>
+        <span class="title"><center>Maze Escape</center></span>
+        <span class="meta">🧠 Puzzle</span>
+      </a>
+      <a href="./Hang-Man/index.html" class="game-btn" data-game="hangman">
+        <span class="icon">💀</span>
+        <span class="title"><center>Hang Man</center></span>
+        <span class="meta">✍️ Word Game</span>
+      </a>
+      <a href="./Reflex-Trainer/index.html" class="game-btn" data-game="Reflex">
+        <span class="icon">⚡</span>
+        <span class="title"><center>Reflex Trainer</center></span>
+        <span class="meta">👟Speed·🎯Accuracy</span>
+      </a>
+      <a href="./upcoming/index.html" class="game-btn" data-game="upcoming">
+        <span class="icon">🔜</span>
+        <span class="title"><center>Upcoming...</center></span>
+        <span class="meta"></span>
+      </a>
+       <a href="./upcoming/index.html" class="game-btn" data-game="upcoming">
+        <span class="icon">🔜</span>
+        <span class="title"><center>Upcoming...</center></span>
+        <span class="meta"></span>
+      </a>
+       <a href="./upcoming/index.html" class="game-btn" data-game="upcoming">
+        <span class="icon">🔜</span>
+        <span class="title"><center>Upcoming...</center></span>
+        <span class="meta"></span>
+      </a>
+    </section>
+  </main>
 
-<a href="./hand-cricket/index.html" class="game-btn" data-game="handcricket">
-  <span class="icon">🏏</span>
-  <span class="title"><center>Hand Cricket</center></span>
-  <span class="meta">🎯 Medium · Sports</span>
-</a>
-
-<a href="./rock-paper-scissors/index.html" class="game-btn" data-game="rps">
-  <span class="icon">🪨📃✂️</span>
-  <span class="title"><center>R P S</center></span>
-  <span class="meta">⚡ Fast · Luck</span>
-</a>
-
-<a href="./Space-Rush/index.html" class="game-btn" data-game="spacerush">
-  <span class="icon">🚀</span>
-  <span class="title"><center>Space Rush</center></span>
-  <span class="meta">🔥 Hard · Arcade</span>
-</a>
-
-<a href="./2P-Tank-Arena/index.html" class="game-btn" data-game="tank">
-  <span class="icon">🛡️</span>
-  <span class="title"><center>2P Tank Arena</center></span>
-  <span class="meta">👥 Multiplayer</span>
-</a>
-
-<a href="./Maze-Escape/index.html" class="game-btn" data-game="maze">
-  <span class="icon">🧩</span>
-  <span class="title"><center>Maze Escape</center></span>
-  <span class="meta">🧠 Puzzle</span>
-</a>
-
-<a href="./Hang-Man/index.html" class="game-btn" data-game="hangman">
-  <span class="icon">💀</span>
-  <span class="title"><center>Hang Man</center></span>
-  <span class="meta">✍️ Word Game</span>
-</a>
-  
-<a href="./Reflex-Trainer/index.html" class="game-btn" data-game="Reflex">
-  <span class="icon">⚡</span>
-  <span class="title"><center>Reflex Trainer</center></span>
-  <span class="meta">👟Speed·🎯Accuracy</span>
-</a>
-  
-<a href="./upcoming/index.html" class="game-btn" data-game="upcoming">
-  <span class="icon">🔜</span>
-  <span class="title"><center>Upcoming...</center></span>
-  <span class="meta"></span>
-</a>
-  
-  <a href="./upcoming/index.html" class="game-btn" data-game="upcoming">
-  <span class="icon">🔜</span>
-  <span class="title"><center>Upcoming...</center></span>
-  <span class="meta"></span>
-</a>
-  
-  <a href="./upcoming/index.html" class="game-btn" data-game="upcoming">
-  <span class="icon">🔜</span>
-  <span class="title"><center>Upcoming...</center></span>
-  <span class="meta"></span>
-</a>
-  
-</section>
-</main>
-
-<footer>
-  <center>
-    <br>
-    <small>Credits: GPT-5 mini </small>
-    <br>
-    Built by <span class="gradient-text"> BetterThanYouBro ⚡</span>
-  </center>
-</footer>
+  <footer>
+    <center>
+      <br>
+      <small>Credits: GPT-5 mini </small>
+      <br>
+      Built by <span class="gradient-text"> BetterThanYouBro ⚡</span>
+    </center>
+  </footer>
+</div>
 
 <script>
 /* STARS */
-const stars = document.getElementById("stars");
-for (let i = 0; i < 100; i++) {
-  const s = document.createElement("div");
-  s.className = "star";
-  const size = Math.random() * 2 + 1;
-  s.style.width = s.style.height = size + "px";
-  s.style.top = Math.random() * 100 + "%";
-  s.style.left = Math.random() * 100 + "%";
-  s.style.animationDuration = Math.random() * 3 + 1 + "s";
+const stars=document.getElementById("stars");
+for(let i=0;i<100;i++){
+  const s=document.createElement("div");
+  s.className="star";
+  const size=Math.random()*2+1;
+  s.style.width=s.style.height=size+"px";
+  s.style.top=Math.random()*100+"%";
+  s.style.left=Math.random()*100+"%";
+  s.style.animationDuration=(Math.random()*3+1)+"s";
   stars.appendChild(s);
 }
 
-/* THEME */
-const toggle = document.getElementById("themeToggle");
-const fontSelect = document.getElementById("fontSelect");
-
-function setTheme(isLight) {
-  document.body.classList.toggle("light", isLight);
-  toggle.textContent = isLight ? "☀️" : "🌙";
-  fontSelect.style.background = isLight ? "rgba(255,255,255,0.85)" : "rgba(15,20,40,0.85)";
-  fontSelect.style.color = isLight ? "#111" : "#eaeaea";
-  localStorage.setItem("theme", isLight ? "light" : "dark");
+/* THEME & FONT */
+const toggle=document.getElementById("themeToggle");
+const fontSelect=document.getElementById("fontSelect");
+function setTheme(isLight){
+  document.body.classList.toggle("light",isLight);
+  toggle.textContent=isLight?"☀️":"🌙";
+  fontSelect.style.background=isLight?"rgba(255,255,255,0.85)":"rgba(15,20,40,0.85)";
+  fontSelect.style.color=isLight?"#111":"#eaeaea";
+  localStorage.setItem("theme",isLight?"light":"dark");
 }
-
-setTheme(localStorage.getItem("theme") === "light");
-
-toggle.onclick = () => {
-  setTheme(!document.body.classList.contains("light"));
-};
-
-/* FONT CHANGER */
-function setFont(font) {
+setTheme(localStorage.getItem("theme")==="light");
+toggle.onclick=()=>{setTheme(!document.body.classList.contains("light"));}
+function setFont(font){
   document.documentElement.style.setProperty("--ui-font", `'${font}', sans-serif`);
-  localStorage.setItem("font", font);
-  fontSelect.value = font;
+  localStorage.setItem("font",font);
+  fontSelect.value=font;
 }
-const savedFont = localStorage.getItem("font") || "Orbitron";
-setFont(savedFont);
-
-fontSelect.addEventListener("change", e => setFont(e.target.value));
+const savedFont=localStorage.getItem("font")||"Orbitron"; setFont(savedFont);
+fontSelect.addEventListener("change",e=>setFont(e.target.value));
 
 /* PLAY COUNT */
-document.querySelectorAll(".game-btn").forEach(btn => {
-  const key = btn.dataset.game + "_plays";
-  let count = localStorage.getItem(key) || 0;
-  const badge = document.createElement("span");
-  badge.className = "plays";
-  badge.textContent = "▶ " + count;
+document.querySelectorAll(".game-btn").forEach(btn=>{
+  const key=btn.dataset.game+"_plays";
+  let count=localStorage.getItem(key)||0;
+  const badge=document.createElement("span");
+  badge.className="plays";
+  badge.textContent="▶ "+count;
   btn.appendChild(badge);
-  btn.addEventListener("click", () => {
-    localStorage.setItem(key, Number(count) + 1);
-  });
+  btn.addEventListener("click",()=>{localStorage.setItem(key,Number(count)+1);});
 });
+
+/* Disable right-click & DevTools */
+document.addEventListener('contextmenu',e=>e.preventDefault());
+document.addEventListener('keydown',e=>{
+  if(e.key==="F12")e.preventDefault();
+  if(e.ctrlKey&&e.shiftKey&&["I","J","C"].includes(e.key))e.preventDefault();
+  if(e.ctrlKey&&e.key==="u")e.preventDefault();
+});
+document.addEventListener('copy',e=>e.preventDefault());
+document.addEventListener('selectstart',e=>e.preventDefault());
 </script>
+
 <script>
-  // Disable right-click
-  document.addEventListener('contextmenu', function(e) {
-    e.preventDefault();
-  });
-
-  // Disable common DevTools shortcuts
-  document.addEventListener('keydown', function(e) {
-    // F12
-    if (e.key === "F12") e.preventDefault();
-
-    // Ctrl+Shift+I or Ctrl+Shift+J
-    if (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "J")) e.preventDefault();
-
-    // Ctrl+U (view source)
-    if (e.ctrlKey && e.key === "u") e.preventDefault();
-
-    // Ctrl+Shift+C (inspect element)
-    if (e.ctrlKey && e.shiftKey && e.key === "C") e.preventDefault();
-  });
-
-  // Optional: prevent text selection and copy (extra protection)
-  document.addEventListener('copy', function(e) { e.preventDefault(); });
-  document.addEventListener('selectstart', function(e) { e.preventDefault(); });
+// ===== LOADING SCREEN =====
+const loadingScreen = document.getElementById("loading-screen");
+const hubContent = document.getElementById("hub-content");
+const progressBar = document.getElementById("progress-bar");
+const totalDuration = 2500; // 2.5 seconds
+let start = null;
+function animateProgress(timestamp){
+  if(!start) start = timestamp;
+  const elapsed = timestamp - start;
+  const percent = Math.min((elapsed / totalDuration) * 100, 100);
+  progressBar.style.width = percent + "%";
+  if(elapsed < totalDuration){
+    requestAnimationFrame(animateProgress);
+  } else {
+    loadingScreen.style.opacity = 0;
+    setTimeout(() => {
+      loadingScreen.style.display = "none";
+      hubContent.style.display = "block"; // show hub
+    }, 300);
+  }
+}
+requestAnimationFrame(animateProgress);
 </script>
+
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
