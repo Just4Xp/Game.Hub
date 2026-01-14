@@ -3,37 +3,61 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🏏 Hand Cricket </title>
+<title>🏏 Hand Cricket – With Loading</title>
 
 <style>
-/* ===== GLOBAL FIXES (NO FLASH / NO WEIRD TEXT) ===== */
-* {
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
-}
+/* ===== GLOBAL FIXES ===== */
+* { user-select: none; -webkit-tap-highlight-color: transparent; }
 button:focus { outline: none; }
 
-/* ===== THEME ===== */
+/* ===== LOADING SCREEN ===== */
+#loading {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(135deg, #e0eafc, #cfdef3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  flex-direction: column;
+  opacity: 1;
+  transition: opacity 0.5s ease;
+}
+#loading span {
+  font-size: 24px;
+  font-weight: bold;
+  color: #1976d2;
+  margin-bottom: 15px;
+}
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 6px solid #ddd;
+  border-top-color: #1976d2;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ===== GAME CARD ===== */
 :root {
-  --bg: linear-gradient(135deg, #e0eafc, #cfdef3);
   --card: rgba(255,255,255,0.78);
   --text: #222;
   --accent: #1976d2;
   --btn: linear-gradient(135deg, #1976d2, #42a5f5);
 }
-
 body {
   margin: 0;
   font-family: "Segoe UI", Tahoma, sans-serif;
-  background: var(--bg);
+  background: linear-gradient(135deg, #e0eafc, #cfdef3);
   color: var(--text);
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-
 .game-card {
+  display: none; /* hidden until loading finishes */
   background: var(--card);
   backdrop-filter: blur(12px);
   border-radius: 22px;
@@ -44,128 +68,50 @@ body {
   text-align: center;
   animation: pop 0.4s ease;
 }
-
-@keyframes pop {
-  from { transform: scale(0.9); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
+@keyframes pop { from { transform: scale(0.9); opacity:0; } to { transform: scale(1); opacity:1; } }
 
 /* ===== SCOREBOARD ===== */
-.scoreboard {
-  display: flex;
-  justify-content: space-between;
-  margin: 15px 0;
-  font-size: 16px;
-}
+.scoreboard { display:flex; justify-content:space-between; margin:15px 0; font-size:16px; }
 
 /* ===== CONTROLS ===== */
-.controls {
-  margin-bottom: 10px;
-}
-.controls button {
-  background: var(--accent);
-  color: white;
-  border: none;
-  padding: 10px 22px;
-  border-radius: 12px;
-  font-size: 14px;
-  cursor: pointer;
-}
+.controls { margin-bottom: 10px; }
+.controls button { background: var(--accent); color: white; border:none; padding:10px 22px; border-radius:12px; font-size:14px; cursor:pointer; }
 
 /* ===== NUMBER BUTTONS ===== */
-#buttons {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin: 15px 0;
-}
-#buttons button {
-  background: var(--btn);
-  color: white;
-  border: none;
-  margin: 6px;
-  width: 55px;
-  height: 55px;
-  border-radius: 14px;
-  font-size: 18px;
-  cursor: pointer;
-  box-shadow: 0 6px 15px rgba(0,0,0,0.25);
-  transition: transform 0.15s, box-shadow 0.15s;
-}
-#buttons button:active {
-  transform: scale(0.85);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-}
+#buttons { display:flex; flex-wrap:wrap; justify-content:center; margin:15px 0; }
+#buttons button { background: var(--btn); color:white; border:none; margin:6px; width:55px; height:55px; border-radius:14px; font-size:18px; cursor:pointer; box-shadow:0 6px 15px rgba(0,0,0,0.25); transition:transform 0.15s,box-shadow 0.15s; }
+#buttons button:active { transform:scale(0.85); box-shadow:0 2px 6px rgba(0,0,0,0.25); }
 
 /* ===== LOG ===== */
-#log {
-  margin-top: 15px;
-  padding: 15px;
-  background: rgba(0,0,0,0.08);
-  border-radius: 14px;
-  min-height: 150px;
-  font-size: 15px;
-  white-space: pre-line;
-  overflow-y: auto;
-}
-.flash {
-  animation: flash 0.5s ease;
-}
-@keyframes flash {
-  from { background-color: rgba(25,118,210,0.25); }
-  to { background-color: rgba(0,0,0,0.08); }
-}
+#log { margin-top:15px; padding:15px; background:rgba(0,0,0,0.08); border-radius:14px; min-height:150px; font-size:15px; white-space:pre-line; overflow-y:auto; }
+.flash { animation: flash 0.5s ease; }
+@keyframes flash { from{ background-color: rgba(25,118,210,0.25); } to{ background-color: rgba(0,0,0,0.08); } }
 
 /* ===== MODAL ===== */
-.modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.45);
-  display: none;
-  align-items: center;
-  justify-content: center;
-}
-.modal-content {
-  background: white;
-  padding: 25px;
-  border-radius: 18px;
-  width: 90%;
-  max-width: 320px;
-  text-align: center;
-  animation: slideUp 0.35s ease;
-}
-@keyframes slideUp {
-  from { transform: translateY(40px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-.modal-content button {
-  margin: 8px;
-  padding: 10px 18px;
-  border: none;
-  border-radius: 10px;
-  font-size: 14px;
-  cursor: pointer;
-  background: var(--accent);
-  color: white;
-}
+.modal { position:fixed; inset:0; background: rgba(0,0,0,0.45); display:none; align-items:center; justify-content:center; }
+.modal-content { background:white; padding:25px; border-radius:18px; width:90%; max-width:320px; text-align:center; animation:slideUp 0.35s ease; }
+@keyframes slideUp { from{ transform: translateY(40px); opacity:0; } to{ transform: translateY(0); opacity:1; } }
+.modal-content button { margin:8px; padding:10px 18px; border:none; border-radius:10px; font-size:14px; cursor:pointer; background: var(--accent); color:white; }
+
 </style>
 </head>
-
 <body>
 
-<div class="game-card">
-  <h1>🏏 Hand Cricket</h1>
+<!-- LOADING SCREEN -->
+<div id="loading">
+  <span>Loading Game...</span>
+  <div class="spinner"></div>
+</div>
 
+<!-- GAME -->
+<div class="game-card" id="gameCard">
+  <h1>🏏 Hand Cricket</h1>
   <div class="scoreboard">
     <div>🧍 You: <span id="userScore">0</span></div>
     <div>🤖 CPU: <span id="compScore">0</span></div>
     <div>🎮 <span id="phase">Batting</span></div>
   </div>
-
-  <div class="controls">
-    <button onclick="restartGame()">🔄 Restart</button>
-  </div>
-
+  <div class="controls"><button onclick="restartGame()">🔄 Restart</button></div>
   <div id="buttons"></div>
   <div id="log"></div>
 </div>
@@ -181,121 +127,109 @@ body {
 </div>
 
 <script>
-let userScore = 0, compScore = 0;
-let phase = "batting";
-let gameOver = false;
-let userHistory = [];
+/* ===== LOADING LOGIC (2.5 seconds) ===== */
+const loadingScreen = document.getElementById("loading");
+const gameCard = document.getElementById("gameCard");
 
-const logBox = document.getElementById("log");
-const modal = document.getElementById("modal");
-const modalTitle = document.getElementById("modalTitle");
-const modalText = document.getElementById("modalText");
-const modalPrimary = document.getElementById("modalPrimary");
-const modalSecondary = document.getElementById("modalSecondary");
-const userScoreEl = document.getElementById("userScore");
-const compScoreEl = document.getElementById("compScore");
-const phaseEl = document.getElementById("phase");
+setTimeout(() => {
+  loadingScreen.style.opacity = 0; // fade out
+  setTimeout(() => { loadingScreen.style.display="none"; gameCard.style.display="block"; }, 500);
+}, 2500); // 2.5 seconds loading
 
-function updateUI() {
-  userScoreEl.textContent = userScore;
-  compScoreEl.textContent = compScore;
-  phaseEl.textContent = phase.charAt(0).toUpperCase() + phase.slice(1);
+/* ===== GAME LOGIC ===== */
+let userScore=0, compScore=0, phase="batting", gameOver=false, userHistory=[];
+const logBox=document.getElementById("log");
+const modal=document.getElementById("modal");
+const modalTitle=document.getElementById("modalTitle");
+const modalText=document.getElementById("modalText");
+const modalPrimary=document.getElementById("modalPrimary");
+const modalSecondary=document.getElementById("modalSecondary");
+const userScoreEl=document.getElementById("userScore");
+const compScoreEl=document.getElementById("compScore");
+const phaseEl=document.getElementById("phase");
+
+function updateUI(){
+  userScoreEl.textContent=userScore;
+  compScoreEl.textContent=compScore;
+  phaseEl.textContent=phase.charAt(0).toUpperCase()+phase.slice(1);
 }
-
-function log(msg) {
-  logBox.innerText += msg + "\n";
-  logBox.scrollTop = logBox.scrollHeight;
+function log(msg){
+  logBox.innerText+=msg+"\n";
+  logBox.scrollTop=logBox.scrollHeight;
   logBox.classList.add("flash");
-  setTimeout(() => logBox.classList.remove("flash"), 250);
+  setTimeout(()=>logBox.classList.remove("flash"),250);
 }
-
-/* ===== SMART CPU ===== */
-function compChoice() {
-  if (userHistory.length >= 3) {
-    const a = userHistory.slice(-3);
-    if (a.every(n => n === a[0])) return a[0];                    // spam
-    if (a[1] === a[0] + 1 && a[2] === a[1] + 1) return Math.min(a[2] + 1, 10); // sequence
-    if (a.every(n => n % 2 === a[0] % 2)) return a[2] % 2 === 0 ? 2 : 3;       // odd/even
+function compChoice(){
+  if(userHistory.length>=3){
+    const a=userHistory.slice(-3);
+    if(a.every(n=>n===a[0])) return a[0];
+    if(a[1]===a[0]+1 && a[2]===a[1]+1) return Math.min(a[2]+1,10);
+    if(a.every(n=>n%2===a[0]%2)) return a[2]%2===0?2:3;
   }
-  if (userHistory.length >= 5) {
-    const freq = {};
-    userHistory.forEach(n => freq[n] = (freq[n] || 0) + 1);
-    const max = Object.keys(freq).reduce((a,b)=>freq[a]>freq[b]?a:b);
-    if (Math.random() < 0.6) return Number(max);
+  if(userHistory.length>=5){
+    const freq={};
+    userHistory.forEach(n=>freq[n]=(freq[n]||0)+1);
+    const max=Object.keys(freq).reduce((a,b)=>freq[a]>freq[b]?a:b);
+    if(Math.random()<0.6) return Number(max);
   }
-  return Math.floor(Math.random() * 10) + 1;
+  return Math.floor(Math.random()*10)+1;
 }
-
-function play(num) {
-  if (gameOver) return;
-
-  const comp = compChoice();
+function play(num){
+  if(gameOver) return;
+  const comp=compChoice();
   userHistory.push(num);
-
   log(`You: ${num} | CPU: ${comp}`);
-
-  if (phase === "batting") {
-    if (num === comp) showOutPopup();
-    else userScore += num;
-  } else {
-    if (num === comp) endGame(true);
-    else {
-      compScore += comp;
-      if (compScore > userScore) endGame(false);
+  if(phase==="batting"){
+    if(num===comp) showOutPopup();
+    else userScore+=num;
+  }else{
+    if(num===comp) endGame(true);
+    else{
+      compScore+=comp;
+      if(compScore>userScore) endGame(false);
     }
   }
   updateUI();
 }
-
-function showOutPopup() {
-  modal.style.display = "flex";
-  modalTitle.textContent = "❌ You are OUT!";
-  modalText.textContent = `Your Score: ${userScore}`;
-  modalPrimary.textContent = "Start Bowling";
-  modalSecondary.textContent = "Restart";
-  modalSecondary.style.display = "inline-block";
-
-  modalPrimary.onclick = () => {
-    modal.style.display = "none";
-    phase = "bowling";
+function showOutPopup(){
+  modal.style.display="flex";
+  modalTitle.textContent="❌ You are OUT!";
+  modalText.textContent=`Your Score: ${userScore}`;
+  modalPrimary.textContent="Start Bowling";
+  modalSecondary.textContent="Restart";
+  modalSecondary.style.display="inline-block";
+  modalPrimary.onclick=()=>{
+    modal.style.display="none";
+    phase="bowling";
     updateUI();
     log("\n🎯 Bowling Time!\n");
   };
-  modalSecondary.onclick = restartGame;
+  modalSecondary.onclick=restartGame;
 }
-
-function endGame(playerWon) {
-  gameOver = true;
-  modal.style.display = "flex";
-  modalSecondary.style.display = "none";
-  modalPrimary.textContent = "Restart";
-  modalTitle.textContent = playerWon ? "🏆 YOU WIN!" : "💥 COMPUTER WINS!";
-  modalText.textContent = playerWon ? "Great play!" : "CPU read your pattern!";
-  modalPrimary.onclick = restartGame;
+function endGame(playerWon){
+  gameOver=true;
+  modal.style.display="flex";
+  modalSecondary.style.display="none";
+  modalPrimary.textContent="Restart";
+  modalTitle.textContent=playerWon?"🏆 YOU WIN!":"💥 COMPUTER WINS!";
+  modalText.textContent=playerWon?"Great play!":"CPU read your pattern!";
+  modalPrimary.onclick=restartGame;
 }
-
-function restartGame() {
-  modal.style.display = "none";
-  userScore = 0;
-  compScore = 0;
-  phase = "batting";
-  gameOver = false;
-  userHistory = [];
-  logBox.innerText = "🔄 New Game Started!\n";
+function restartGame(){
+  modal.style.display="none";
+  userScore=0; compScore=0; phase="batting"; gameOver=false; userHistory=[];
+  logBox.innerText="🔄 New Game Started!\n";
   updateUI();
 }
 
-/* INIT */
-const btnContainer = document.getElementById("buttons");
-for (let i = 1; i <= 10; i++) {
-  const b = document.createElement("button");
-  b.textContent = i;
-  b.onclick = () => play(i);
+/* INIT BUTTONS */
+const btnContainer=document.getElementById("buttons");
+for(let i=1;i<=10;i++){
+  const b=document.createElement("button");
+  b.textContent=i; b.onclick=()=>play(i);
   btnContainer.appendChild(b);
 }
-
 log("🎮 Start Batting!");
 </script>
-
 </body>
 </html>
