@@ -231,5 +231,19 @@ for(let i=1;i<=10;i++){
 }
 log("🎮 Start Batting!");
 </script>
+  <script>// Disable right-click
+document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+
+// Disable common DevTools shortcuts
+document.addEventListener('keydown', function(e) {
+  if (e.key === "F12") e.preventDefault();
+  if (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "J" || e.key === "C")) e.preventDefault();
+  if (e.ctrlKey && e.key === "u") e.preventDefault();
+});
+
+// Optional: prevent text selection
+document.addEventListener('copy', e => e.preventDefault());
+document.addEventListener('selectstart', e => e.preventDefault());
+</script>
 </body>
 </html>
