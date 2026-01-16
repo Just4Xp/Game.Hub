@@ -5,6 +5,42 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Clicker Game</title>
 <style>
+  /* ===== LOADING SCREEN ===== */
+#loadingScreen {
+    position: fixed;
+    inset: 0;
+    background: #1e1e2f;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+#loadingScreen h1 {
+    color: #ffd700;
+    margin-bottom: 20px;
+    font-size: 28px;
+}
+
+.loader-bar {
+    width: 220px;
+    height: 8px;
+    background: #333;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.loader-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #ffd700, #ff9800);
+    animation: loadFill 1.5s linear forwards;
+}
+
+@keyframes loadFill {
+    to { width: 100%; }
+}
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: #1e1e2f;
@@ -50,7 +86,14 @@ button {
 </style>
 </head>
 <body>
-
+  <!-- Loading Screen -->
+<div id="loadingScreen">
+  <h1>Clicker Game</h1>
+  <div class="loader-bar">
+    <div class="loader-fill"></div>
+  </div>
+</div>
+  
 <h1>Clicker Game - Goal 1M</h1>
 
 <div id="score">0</div>
@@ -68,6 +111,11 @@ button {
 <button id="backButton">⬅ Back to Hub</button>
 
 <script>
+  window.addEventListener("load", () => {
+    setTimeout(() => {
+      document.getElementById("loadingScreen").style.display = "none";
+    }, 1500);
+  });
 /* ================== VARIABLES ================== */
 let score = 0;
 let clickPower = 1, clickUpgradeCost = 20;
