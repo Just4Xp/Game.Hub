@@ -5,6 +5,43 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tic Tac Toe</title>
 <style>
+  /* Loading Screen Styles */
+#loadingScreen {
+  position: fixed;
+  inset: 0;
+  background: #1e1e2f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  transition: opacity 0.5s ease;
+}
+
+.loader-container {
+  text-align: center;
+}
+
+.spinner {
+  width: 80px;
+  height: 80px;
+  border: 6px solid #3e3e60;
+  border-top: 6px solid #ffd700;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+.loader-container h2 {
+  color: #ffd700;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
   body {
     display: flex;
     flex-direction: column;
@@ -70,7 +107,13 @@
 </style>
 </head>
 <body>
-
+  <!-- Loading Screen -->
+<div id="loadingScreen">
+  <div class="loader-container">
+    <div class="spinner"></div>
+    <h2>Loading Tic Tac Toe...</h2>
+  </div>
+</div>
 <h1>Tic Tac Toe</h1>
 
 <select id="modeSelect">
@@ -95,7 +138,12 @@
 <button id="backHub">⬅ Back to Hub</button>
 
 <script>
-const board = document.getElementById('board');
+  setTimeout(() => {
+    const loader = document.getElementById("loadingScreen");
+    loader.style.display = "none";
+    document.body.style.overflow = "auto";
+  }, 1500); // EXACT 1.5 seconds
+const board = document.getElementById('board'); 
 const cells = document.querySelectorAll('.cell');
 const message = document.getElementById('message');
 const restartButton = document.getElementById('restart');
